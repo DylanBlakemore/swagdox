@@ -1,0 +1,51 @@
+defmodule Swagdox.PathTest do
+  use ExUnit.Case
+
+  alias Swagdox.Endpoint
+  alias Swagdox.Path
+
+  @create_endpoint %Endpoint{
+    module: SwagdoxWeb.UserController,
+    function: :create,
+    docstring: """
+    Creates a User.
+
+    API:
+      @query_param user, map, required, "User attributes"
+
+      @response 201, User, "User created"
+      @response 400, "Invalid user attributes"
+    """
+  }
+
+  @create_route %{
+    path: "/users",
+    plug: SwagdoxWeb.UserController,
+    plug_opts: :create,
+    verb: :post
+  }
+
+  setup do
+    path = Path.build(@create_endpoint, @create_route)
+
+    {:ok, path: path}
+  end
+
+  describe "build/2" do
+    test "returns a Path", %{path: path} do
+      assert %Path{} = path
+    end
+
+    test "gets the path from the route", %{path: path} do
+      assert path.path == "/users"
+    end
+
+    test "gets the verb from the route", %{path: path} do
+      assert path.verb == :post
+    end
+
+    test "gets the description from the endpoint", %{path: path} do
+      assert path.description == "Creates a User."
+    end
+  end
+end

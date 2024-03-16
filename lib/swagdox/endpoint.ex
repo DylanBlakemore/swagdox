@@ -1,11 +1,15 @@
-defmodule Swagdox.Extractor do
+defmodule Swagdox.Endpoint do
   @moduledoc """
-  Extracts function docs that contain Open API specifications.
+  Describes  a documented endpoint in an application controller.
   """
+  defstruct [:module, :function, :docstring]
 
-  @type description :: String.t()
-  @type specification :: String.t()
-  @type extraction :: {atom(), description(), specification()}
+  @type docstring :: String.t()
+  @type t :: %__MODULE__{
+          module: module(),
+          function: atom(),
+          docstring: docstring()
+        }
 
   @locale "en"
 
@@ -22,12 +26,12 @@ defmodule Swagdox.Extractor do
         @path GET /users/:id
         @param id, integer, required, "User ID"
 
-        @response 200, "User found"
+        @response 200, User, "User found"
         @response 403, "User not authorized"
         @response 404, "User not found"
   """
-  @spec extract(module()) :: {:ok, [extraction()]} | {:error, String.t()}
-  def extract(module) do
+  @spec extract_all(module()) :: {:ok, t()} | {:error, String.t()}
+  def extract_all(module) do
     case extract_function_docs(module) do
       {:error, reason} -> {:error, reason}
       function_docs -> {:ok, function_docs}
@@ -40,13 +44,15 @@ defmodule Swagdox.Extractor do
         function_docs
         |> Enum.map(&extract_function_doc/1)
         |> Enum.filter(&api_docs?/1)
-        |> Enum.map(&separate_description/1)
+        |> Enum.map(fn {function, docstring} ->
+          %__MODULE__{module: module, function: function, docstring: docstring}
+        end)
 
       {:error, {:invalid_chunk, binary}} ->
         {:error, "Invalid chunk: #{binary}"}
 
       {:error, :module_not_found} ->
-        {:error, "Module not found"}
+        {:error, "Module '#{inspect(module)}' not found"}
 
       {:error, :chunk_not_found} ->
         {:error, "Chunk not found"}
@@ -68,13 +74,5 @@ defmodule Swagdox.Extractor do
     doc_content
     |> String.split("\n")
     |> Enum.any?(fn line -> String.trim(line) == "API:" end)
-  end
-
-  defp separate_description({function, doc_content}) do
-    [description, spec] =
-      doc_content
-      |> String.split("API:\n")
-
-    {function, String.trim(description), spec}
   end
 end
