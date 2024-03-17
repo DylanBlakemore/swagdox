@@ -8,6 +8,14 @@ defmodule Swagdox.Parser do
     "@response"
   ]
 
+  @doc """
+  Extracts the description from a docstring.
+
+  Examples:
+
+        iex> extract_description("Creates a User.")
+        "Creates a User."
+  """
   @spec extract_description(String.t()) :: String.t()
   def extract_description(docstring) do
     docstring

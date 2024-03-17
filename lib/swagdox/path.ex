@@ -19,6 +19,18 @@ defmodule Swagdox.Path do
           verb: atom()
         }
 
+  @doc """
+  Builds a new Path.
+
+  Examples:
+
+    iex> Swagdox.Path.build(endpoint, route)
+    %Swagdox.Path{
+      description: "Creates a User.",
+      path: "/users",
+      verb: :post
+    }
+  """
   @spec build(Endpoint.t(), route()) :: %__MODULE__{}
   def build(endpoint, route) do
     %__MODULE__{
