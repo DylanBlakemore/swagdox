@@ -1,11 +1,12 @@
 defmodule Swagdox.Parser do
+  @moduledoc """
+  Parses endpoint docstrings to extract Open API specification data.
+  """
+
   defmodule ParserError do
     defexception message: "Parser error"
   end
 
-  @moduledoc """
-  Parses endpoint docstrings to extract Open API specification data.
-  """
   @configuration_keys [
     "@param",
     "@response"
