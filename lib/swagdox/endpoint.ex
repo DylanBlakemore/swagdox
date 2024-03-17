@@ -23,7 +23,6 @@ defmodule Swagdox.Endpoint do
       Returns a User.
 
       API:
-        @path GET /users/:id
         @param id, integer, required, "User ID"
 
         @response 200, User, "User found"

@@ -3,6 +3,11 @@ defmodule Swagdox.Parser do
   Parses endpoint docstrings to extract Open API specification data.
   """
 
+  @configuration_keys [
+    "@param",
+    "@response"
+  ]
+
   @spec extract_description(String.t()) :: String.t()
   def extract_description(docstring) do
     docstring
@@ -12,15 +17,33 @@ defmodule Swagdox.Parser do
   end
 
   @doc """
+  Extracts the type of configuration and its value from a line in the Open API specification.
+
+  Examples:
+
+        iex> extract_config("@param user, map, \"User attributes\"")
+        {"@param", "user, map, \"User attributes\""}
+  """
+  @spec extract_config(String.t()) :: {:ok, {atom(), String.t()}} | {:error, String.t()}
+  def extract_config(line) do
+    trimmed = String.trim(line)
+
+    case String.split(trimmed, " ", parts: 2) do
+      [key, value] when key in @configuration_keys ->
+        {:ok, {key, value}}
+
+      _ ->
+        {:error, "Invalid configuration: #{trimmed}"}
+    end
+  end
+
+  @doc """
   Extracts the parameter details from a line in the Open API specification.
 
   Examples:
 
-        iex> extract_arguments("id, integer, required, \"User ID\"")
-        [:id, :integer, :required, "User ID"]
-
-        iex> extract_arguments("id, integer, \"User ID\"")
-        [:id, :integer, "User ID"]
+        iex> extract_arguments("id(query), integer, \"User ID\", required: true")
+        [{"id", "query"}, "integer", "User ID", {:required, true}]
   """
   @spec extract_arguments(String.t()) :: {:ok, list()} | {:error, String.t()}
   def extract_arguments(line) do
@@ -54,7 +77,11 @@ defmodule Swagdox.Parser do
     {to_string(name), to_string(location)}
   end
 
-  defp parse_node(value) when is_binary(value) do
+  defp parse_node({name, value}) when is_atom(name) do
+    {name, parse_node(value)}
+  end
+
+  defp parse_node(value) when is_binary(value) or is_boolean(value) or is_number(value) do
     value
   end
 end
