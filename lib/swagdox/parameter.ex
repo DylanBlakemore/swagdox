@@ -78,6 +78,7 @@ defmodule Swagdox.Parameter do
   @spec schema(String.t(), keyword()) :: map()
   def schema(type, opts) when type in @standard_types do
     opts
+    |> Keyword.drop([:required])
     |> Enum.into(%{
       type: type
     })
