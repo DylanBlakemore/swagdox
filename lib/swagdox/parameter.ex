@@ -32,7 +32,7 @@ defmodule Swagdox.Parameter do
 
   Examples:
 
-        iex> Swagdox.Parameter.new({"id", "query"}, "integer", "User ID")
+        iex> Swagdox.Parameter.build({"id", "query"}, "integer", "User ID")
         %Swagdox.Parameter{
           name: "id",
           in: "query",
@@ -40,7 +40,7 @@ defmodule Swagdox.Parameter do
           description: "User ID",
           schema: %{type: "integer"}
         }
-        iex> Swagdox.Parameter.new({"id", "query"}, "integer", "User ID", required: true)
+        iex> Swagdox.Parameter.build({"id", "query"}, "integer", "User ID", required: true)
         %Swagdox.Parameter{
           name: "id",
           in: "query",
@@ -49,13 +49,13 @@ defmodule Swagdox.Parameter do
           schema: %{type: "integer"}
         }
   """
-  @spec new(tuple(), String.t(), String.t()) :: t()
-  def new(name_and_location, type, description) do
-    new(name_and_location, type, description, [])
+  @spec build(tuple(), String.t(), String.t()) :: t()
+  def build(name_and_location, type, description) do
+    build(name_and_location, type, description, [])
   end
 
-  @spec new(tuple(), String.t(), String.t(), keyword()) :: t()
-  def new({name, location}, type, description, opts) do
+  @spec build(tuple(), String.t(), String.t(), keyword()) :: t()
+  def build({name, location}, type, description, opts) do
     %__MODULE__{
       name: name,
       in: location,

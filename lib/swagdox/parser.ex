@@ -1,8 +1,11 @@
 defmodule Swagdox.Parser do
+  defmodule ParserError do
+    defexception message: "Parser error"
+  end
+
   @moduledoc """
   Parses endpoint docstrings to extract Open API specification data.
   """
-
   @configuration_keys [
     "@param",
     "@response"
@@ -59,6 +62,8 @@ defmodule Swagdox.Parser do
       {:ok, ast} -> parse_ast(ast)
       {:error, reason} -> {:error, reason}
     end
+  rescue
+    ParserError -> {:error, "Unable to parse argument"}
   end
 
   defp to_structured(line) do
@@ -70,10 +75,6 @@ defmodule Swagdox.Parser do
 
   defp parse_ast(ast) when is_list(ast) do
     {:ok, Enum.map(ast, &parse_node/1)}
-  end
-
-  defp parse_ast(_ast) do
-    {:error, "Invalid AST"}
   end
 
   defp parse_node({value, _meta, nil}) do
@@ -90,5 +91,9 @@ defmodule Swagdox.Parser do
 
   defp parse_node(value) when is_binary(value) or is_boolean(value) or is_number(value) do
     value
+  end
+
+  defp parse_node(_value) do
+    raise ParserError
   end
 end

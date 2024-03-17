@@ -32,4 +32,8 @@ defmodule SwagdoxWeb.UserController do
   @spec create(any(), map()) :: nil
   def create(_conn, _params) do
   end
+
+  @spec delete(any(), map()) :: nil
+  def delete(_conn, _params) do
+  end
 end

@@ -47,25 +47,16 @@ defmodule Swagdox.Endpoint do
           %__MODULE__{module: module, function: function, docstring: docstring}
         end)
 
-      {:error, {:invalid_chunk, binary}} ->
-        {:error, "Invalid chunk: #{binary}"}
-
       {:error, :module_not_found} ->
         {:error, "Module '#{inspect(module)}' not found"}
-
-      {:error, :chunk_not_found} ->
-        {:error, "Chunk not found"}
     end
   end
 
   defp extract_function_doc({{_, _, _}, _, _, :none, _}), do: nil
-  defp extract_function_doc({{_, _, _}, _, _, :hidden, _}), do: nil
 
   defp extract_function_doc({{:function, function, _}, _, _, doc_content, _}) do
     {function, Map.get(doc_content, @locale)}
   end
-
-  defp extract_function_doc({{_type, _, _}, _, _, _, _}), do: nil
 
   defp api_docs?(nil), do: false
 

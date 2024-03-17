@@ -32,6 +32,20 @@ defmodule Swagdox.ParserTest do
   end
 
   describe "extract_arguments/1" do
+    test "invalid ast" do
+      line = "%{hello: :world}"
+
+      assert Parser.extract_arguments(line) ==
+               {:error, "Unable to parse argument"}
+    end
+
+    test "invalid syntax" do
+      line = ".> ("
+
+      assert Parser.extract_arguments(line) ==
+               {:error, "Unable to parse line: [.> (]"}
+    end
+
     test "parses a line with all arguments" do
       line = "id(query), integer, \"User ID\", required: true"
 
@@ -42,6 +56,13 @@ defmodule Swagdox.ParserTest do
     test "parses a line with optional arguments" do
       line = "id(body), integer, \"User ID\""
       assert Parser.extract_arguments(line) == {:ok, [{"id", "body"}, "integer", "User ID"]}
+    end
+
+    test "string-value kwarg" do
+      line = "id(body), integer, \"User ID\", format: password"
+
+      assert Parser.extract_arguments(line) ==
+               {:ok, [{"id", "body"}, "integer", "User ID", format: "password"]}
     end
   end
 end

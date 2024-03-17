@@ -12,7 +12,7 @@ defmodule Swagdox.EndpointTest do
     end
 
     test "successful extraction extracts the description and spec" do
-      {:ok, [%{module: UserController, function: function, docstring: docstring}, _show]} =
+      {:ok, [%Endpoint{module: UserController, function: function, docstring: docstring}, _show]} =
         Endpoint.extract_all(UserController)
 
       assert function == :create
@@ -26,6 +26,12 @@ defmodule Swagdox.EndpointTest do
                @response 201, User, "User created"
                @response 400, "Invalid user attributes"
              """
+    end
+
+    test "module not found" do
+      {:error, reason} = Endpoint.extract_all(NonExistentModule)
+
+      assert reason == "Module 'NonExistentModule' not found"
     end
   end
 end
