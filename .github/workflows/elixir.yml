@@ -40,4 +40,4 @@ jobs:
     - name: Run credo
       run: mix credo --all
     - name: Dialyzer
-      command: mix dialyzer
+      run: mix dialyzer
