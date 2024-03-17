@@ -1,4 +1,4 @@
-![CI Pipeline](https://github.com/github/docs/actions/workflows/elixir.yml/badge.svg)
+![CI Pipeline](https://github.com/dylanblakemore/swagdox/actions/workflows/elixir.yml/badge.svg)
 # Swagdox
 
 Swagdox is a Swagger/OpenAPI specification generator inspired by [Swaggeryard](https://github.com/livingsocial/swagger_yard).
