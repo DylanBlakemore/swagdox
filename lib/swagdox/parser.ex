@@ -55,9 +55,8 @@ defmodule Swagdox.Parser do
   """
   @spec extract_arguments(String.t()) :: {:ok, list()} | {:error, String.t()}
   def extract_arguments(line) do
-    with {:ok, ast} <- to_structured("[#{line}]") do
-      parse_ast(ast)
-    else
+    case to_structured("[#{line}]") do
+      {:ok, ast} -> parse_ast(ast)
       {:error, reason} -> {:error, reason}
     end
   end
