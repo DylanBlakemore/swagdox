@@ -3,6 +3,7 @@ defmodule Swagdox.Spec do
   OpenAPI specification.
   """
   alias Swagdox.Config
+  alias Swagdox.Path
 
   defstruct [
     :openapi,
@@ -15,16 +16,27 @@ defmodule Swagdox.Spec do
 
   @type t :: %__MODULE__{}
 
+  @doc """
+  Initializes a new OpenAPI specification.
+  """
   @spec init() :: t()
   def init do
     %__MODULE__{
       openapi: Config.openapi_version(),
       info: info(),
       servers: Config.api_servers(),
-      paths: %{},
+      paths: [],
       tags: [],
       components: components()
     }
+  end
+
+  @doc """
+  Assigns the paths in the specification.
+  """
+  @spec set_paths(t(), list(Path.t())) :: t()
+  def set_paths(spec, paths) do
+    %{spec | paths: paths}
   end
 
   defp info do
@@ -37,8 +49,8 @@ defmodule Swagdox.Spec do
 
   defp components do
     %{
-      schemas: %{},
-      securitySchemes: %{}
+      schemas: [],
+      securitySchemes: []
     }
   end
 end

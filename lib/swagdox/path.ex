@@ -8,7 +8,9 @@ defmodule Swagdox.Path do
   defstruct [
     :description,
     :path,
-    :verb
+    :verb,
+    :function,
+    :controller
   ]
 
   @type t :: %__MODULE__{}
@@ -36,7 +38,9 @@ defmodule Swagdox.Path do
     %__MODULE__{
       description: Parser.extract_description(endpoint.docstring),
       path: route.path,
-      verb: route.verb
+      verb: route.verb,
+      function: endpoint.function,
+      controller: endpoint.module
     }
   end
 end
