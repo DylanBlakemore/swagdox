@@ -2,7 +2,8 @@ defmodule Swagdox.Renderer do
   @moduledoc """
   Renders a Spec instance to a valid OpenAPI specification.
   """
-  alias Swagdox.{Parameter, Spec}
+  alias Swagdox.Parameter
+  alias Swagdox.Spec
 
   @doc """
   Renders an OpenAPI specification to a basic map.
