@@ -51,6 +51,8 @@ jobs:
         with:
           elixir-version: '1.15.2'
           otp-version: '26.0'
+      - name: Install dependencies
+        run: mix deps.get
       - name: Run tests
         run: mix test
   lint:
@@ -69,6 +71,8 @@ jobs:
         with:
           elixir-version: '1.15.2'
           otp-version: '26.0'
+      - name: Install dependencies
+        run: mix deps.get
       - name: Run formatter
         run: mix format --check-formatted --dry-run
       - name: Run credo
