@@ -10,7 +10,8 @@ defmodule Swagdox.Path do
     :path,
     :verb,
     :function,
-    :controller
+    :controller,
+    parameters: []
   ]
 
   @type t :: %__MODULE__{}
@@ -42,5 +43,10 @@ defmodule Swagdox.Path do
       function: endpoint.function,
       controller: endpoint.module
     }
+  end
+
+  @spec operation_id(t()) :: String.t()
+  def operation_id(path) do
+    "#{path.controller}-#{path.function}" |> String.replace("Elixir.", "")
   end
 end

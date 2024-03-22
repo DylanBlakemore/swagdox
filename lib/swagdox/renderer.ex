@@ -2,7 +2,7 @@ defmodule Swagdox.Renderer do
   @moduledoc """
   Renders a Spec instance to a valid OpenAPI specification.
   """
-  alias Swagdox.Spec
+  alias Swagdox.{Parameter, Spec}
 
   @doc """
   Renders an OpenAPI specification to a basic map.
@@ -50,7 +50,12 @@ defmodule Swagdox.Renderer do
 
   defp render_path(path) do
     %{
-      "description" => path.description
+      "description" => path.description,
+      "parameters" => render_parameters(path.parameters)
     }
+  end
+
+  defp render_parameters(parameters) do
+    Enum.map(parameters, &Parameter.render/1)
   end
 end

@@ -48,4 +48,10 @@ defmodule Swagdox.PathTest do
       assert path.description == "Creates a User."
     end
   end
+
+  describe "operation_id/1" do
+    test "returns the operation ID", %{path: path} do
+      assert Path.operation_id(path) == "SwagdoxWeb.UserController-create"
+    end
+  end
 end

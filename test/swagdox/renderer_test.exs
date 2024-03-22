@@ -1,7 +1,9 @@
 defmodule Swagdox.RendererTest do
   use ExUnit.Case
 
+  alias Swagdox.Parameter
   alias Swagdox.Path
+  alias Swagdox.Renderer
   alias Swagdox.Spec
 
   setup do
@@ -19,7 +21,18 @@ defmodule Swagdox.RendererTest do
       %Path{
         verb: "get",
         path: "/users/:id",
-        description: "Returns a User."
+        description: "Returns a User.",
+        parameters: [
+          %Parameter{
+            name: "id",
+            in: "query",
+            description: "User ID",
+            required: true,
+            schema: %{
+              type: "string"
+            }
+          }
+        ]
       },
       %Path{
         verb: "get",
@@ -43,7 +56,7 @@ defmodule Swagdox.RendererTest do
         "version" => "0.1"
       }
 
-      assert Swagdox.Renderer.render_spec(spec)["info"] == expected_info
+      assert Renderer.render_spec(spec)["info"] == expected_info
     end
 
     test "renders the servers", %{spec: spec} do
@@ -53,32 +66,41 @@ defmodule Swagdox.RendererTest do
         }
       ]
 
-      assert Swagdox.Renderer.render_spec(spec)["servers"] == expected_servers
+      assert Renderer.render_spec(spec)["servers"] == expected_servers
     end
 
     test "renders the paths", %{spec: spec} do
-      expected_paths = %{
-        "/users" => %{
-          "get" => %{
-            "description" => "Returns a list of users."
-          },
-          "post" => %{
-            "description" => "Creates a User."
-          }
-        },
-        "/users/:id" => %{
-          "get" => %{
-            "description" => "Returns a User."
-          }
-        },
-        "/orders" => %{
-          "get" => %{
-            "description" => "Returns a list of orders."
-          }
-        }
-      }
-
-      assert Swagdox.Renderer.render_spec(spec)["paths"] == expected_paths
+      assert %{
+               "/users" => %{
+                 "get" => %{
+                   "description" => "Returns a list of users."
+                 },
+                 "post" => %{
+                   "description" => "Creates a User."
+                 }
+               },
+               "/users/:id" => %{
+                 "get" => %{
+                   "description" => "Returns a User.",
+                   "parameters" => [
+                     %{
+                       "description" => "User ID",
+                       "in" => "query",
+                       "name" => "id",
+                       "required" => true,
+                       "schema" => %{
+                         "type" => "string"
+                       }
+                     }
+                   ]
+                 }
+               },
+               "/orders" => %{
+                 "get" => %{
+                   "description" => "Returns a list of orders."
+                 }
+               }
+             } = Renderer.render_spec(spec)["paths"]
     end
   end
 end

@@ -34,4 +34,28 @@ defmodule Swagdox.ParameterTest do
              }
            } = Parameter.build({"user", "body"}, "object", "User attributes")
   end
+
+  test "render/1" do
+    parameter = %Swagdox.Parameter{
+      name: "user",
+      in: "body",
+      description: "User attributes",
+      required: true,
+      schema: %{
+        type: "string",
+        format: "password"
+      }
+    }
+
+    assert %{
+             "name" => "user",
+             "in" => "body",
+             "description" => "User attributes",
+             "required" => true,
+             "schema" => %{
+               "type" => "string",
+               "format" => "password"
+             }
+           } = Parameter.render(parameter)
+  end
 end

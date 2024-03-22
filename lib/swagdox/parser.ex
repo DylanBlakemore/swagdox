@@ -7,11 +7,6 @@ defmodule Swagdox.Parser do
     defexception message: "Parser error"
   end
 
-  @configuration_keys [
-    "@param",
-    "@response"
-  ]
-
   @doc """
   Extracts the description from a docstring.
 
@@ -33,41 +28,26 @@ defmodule Swagdox.Parser do
 
   Examples:
 
-        iex> extract_config("@param user, map, \"User attributes\"")
-        {"@param", "user, map, \"User attributes\""}
+        iex> parse_definition("@param user(query), map, \"User attributes\"")
+        {:param, [{"user", "query"}, "map", "User attributes"]}
   """
-  @spec extract_config(String.t()) :: {:ok, {atom(), String.t()}} | {:error, String.t()}
-  def extract_config(line) do
-    trimmed = String.trim(line)
+  @spec parse_definition(String.t()) :: {:ok, {atom(), list()}} | {:error, String.t()}
+  def parse_definition(line) do
+    case to_ast(line) do
+      {:ok, {:@, _, [{func, _, params}]}} ->
+        {:ok, {func, parse_ast(params)}}
 
-    case String.split(trimmed, " ", parts: 2) do
-      [key, value] when key in @configuration_keys ->
-        {:ok, {key, value}}
+      {:ok, _} ->
+        {:error, "Invalid syntax"}
 
-      _ ->
-        {:error, "Invalid configuration: #{trimmed}"}
-    end
-  end
-
-  @doc """
-  Extracts the parameter details from a line in the Open API specification.
-
-  Examples:
-
-        iex> extract_arguments("id(query), integer, \"User ID\", required: true")
-        [{"id", "query"}, "integer", "User ID", {:required, true}]
-  """
-  @spec extract_arguments(String.t()) :: {:ok, list()} | {:error, String.t()}
-  def extract_arguments(line) do
-    case to_structured("[#{line}]") do
-      {:ok, ast} -> parse_ast(ast)
-      {:error, reason} -> {:error, reason}
+      {:error, reason} ->
+        {:error, reason}
     end
   rescue
-    ParserError -> {:error, "Unable to parse argument"}
+    e in ParserError -> {:error, e.message}
   end
 
-  defp to_structured(line) do
+  defp to_ast(line) do
     case Code.string_to_quoted(line) do
       {:ok, ast} -> {:ok, ast}
       {:error, _} -> {:error, "Unable to parse line: #{line}"}
@@ -75,7 +55,7 @@ defmodule Swagdox.Parser do
   end
 
   defp parse_ast(ast) when is_list(ast) do
-    {:ok, Enum.map(ast, &parse_node/1)}
+    Enum.map(ast, &parse_node/1)
   end
 
   defp parse_node({value, _meta, nil}) do
@@ -94,7 +74,11 @@ defmodule Swagdox.Parser do
     value
   end
 
-  defp parse_node(_value) do
-    raise ParserError
+  defp parse_node(node) when is_list(node) do
+    Enum.map(node, &parse_node/1)
+  end
+
+  defp parse_node(node) do
+    raise ParserError, message: "Unable to parse node: #{inspect(node)}"
   end
 end

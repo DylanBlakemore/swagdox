@@ -17,52 +17,54 @@ defmodule Swagdox.ParserTest do
     assert Parser.extract_description(docstring) == "Creates a User."
   end
 
-  describe "extract_config/1" do
-    test "parses a valid line" do
-      line = "@param user, map, \"User attributes\""
-      assert Parser.extract_config(line) == {:ok, {"@param", "user, map, \"User attributes\""}}
-    end
-
-    test "parses an invalid line" do
-      line = "user, map, \"User attributes\", required: true"
-
-      assert Parser.extract_config(line) ==
-               {:error, "Invalid configuration: user, map, \"User attributes\", required: true"}
-    end
-  end
-
-  describe "extract_arguments/1" do
+  describe "parse_definition/1" do
     test "invalid ast" do
       line = "%{hello: :world}"
 
-      assert Parser.extract_arguments(line) ==
-               {:error, "Unable to parse argument"}
+      assert Parser.parse_definition(line) ==
+               {:error, "Invalid syntax"}
     end
 
     test "invalid syntax" do
       line = ".> ("
 
-      assert Parser.extract_arguments(line) ==
-               {:error, "Unable to parse line: [.> (]"}
+      assert Parser.parse_definition(line) ==
+               {:error, "Unable to parse line: .> ("}
+    end
+
+    test "node error" do
+      line = "@param user, map, %{hello: :world}"
+
+      assert Parser.parse_definition(line) ==
+               {:error, "Unable to parse node: {:%{}, [line: 1], [hello: :world]}"}
     end
 
     test "parses a line with all arguments" do
-      line = "id(query), integer, \"User ID\", required: true"
+      line = "@param id(query), integer, \"User ID\", required: true"
 
-      assert Parser.extract_arguments(line) ==
-               {:ok, [{"id", "query"}, "integer", "User ID", required: true]}
+      assert Parser.parse_definition(line) ==
+               {:ok, {:param, [{"id", "query"}, "integer", "User ID", [required: true]]}}
     end
 
     test "parses a line with optional arguments" do
-      line = "id(body), integer, \"User ID\""
-      assert Parser.extract_arguments(line) == {:ok, [{"id", "body"}, "integer", "User ID"]}
+      line = "@param id(body), integer, \"User ID\""
+
+      assert Parser.parse_definition(line) ==
+               {:ok, {:param, [{"id", "body"}, "integer", "User ID"]}}
     end
 
     test "string-value kwarg" do
-      line = "id(body), integer, \"User ID\", format: password"
+      line = "@param id(body), integer, \"User ID\", format: password"
 
-      assert Parser.extract_arguments(line) ==
-               {:ok, [{"id", "body"}, "integer", "User ID", format: "password"]}
+      assert Parser.parse_definition(line) ==
+               {:ok, {:param, [{"id", "body"}, "integer", "User ID", [format: "password"]]}}
+    end
+
+    test "complex types" do
+      line = "@param id(body), array(integer), \"User ID\""
+
+      assert Parser.parse_definition(line) ==
+               {:ok, {:param, [{"id", "body"}, {"array", "integer"}, "User ID"]}}
     end
   end
 end

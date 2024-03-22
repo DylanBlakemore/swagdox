@@ -87,4 +87,25 @@ defmodule Swagdox.Parameter do
   def schema(type, _opts) do
     raise ArgumentError, "Invalid type: #{type}"
   end
+
+  @doc """
+  Renders a Parameter as a map.
+  """
+  @spec render(t()) :: map()
+  def render(parameter) do
+    %{
+      "name" => parameter.name,
+      "in" => parameter.in,
+      "required" => parameter.required,
+      "description" => parameter.description,
+      "schema" => render_schema(parameter.schema)
+    }
+  end
+
+  defp render_schema(schema) do
+    schema
+    |> Enum.reduce(%{}, fn {key, value}, acc ->
+      Map.put(acc, to_string(key), value)
+    end)
+  end
 end

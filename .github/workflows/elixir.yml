@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build:
-    name: Build and test
+    name: Build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -33,11 +33,19 @@ jobs:
         restore-keys: ${{ runner.os }}-mix-
     - name: Install dependencies
       run: mix deps.get
-    - name: Run tests
-      run: mix test
-    - name: Run formatter
-      run: mix format --check-formatted --dry-run
-    - name: Run credo
-      run: mix credo --all
-    - name: Dialyzer
-      run: mix dialyzer
+  test:
+    name: Run tests
+    needs: build
+    steps:
+      - name: Run tests
+        run: mix test
+  lint:
+    name: Lint
+    needs: build
+    steps:
+      - name: Run formatter
+        run: mix format --check-formatted --dry-run
+      - name: Run credo
+        run: mix credo --all
+      - name: Dialyzer
+        run: mix dialyzer
