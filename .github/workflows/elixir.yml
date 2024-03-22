@@ -36,12 +36,14 @@ jobs:
   test:
     name: Run tests
     needs: build
+    runs-on: ubuntu-latest
     steps:
       - name: Run tests
         run: mix test
   lint:
     name: Lint
     needs: build
+    runs-on: ubuntu-latest
     steps:
       - name: Run formatter
         run: mix format --check-formatted --dry-run
