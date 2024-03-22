@@ -18,6 +18,8 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.deps-cache.outputs.cache-key }}
     steps:
     - uses: actions/checkout@v3
     - name: Set up Elixir
@@ -39,6 +41,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Restore dependencies cache
+        uses: actions/cache@v3
+        with:
+          path: deps
+          key: ${{ needs.build.outputs.cache-key }}
+      - name: Set up Elixir
+        uses: erlef/setup-beam@61e01a43a562a89bfc54c7f9a378ff67b03e4a21
+        with:
+          elixir-version: '1.15.2'
+          otp-version: '26.0'
       - name: Run tests
         run: mix test
   lint:
@@ -46,6 +58,17 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+      - name: Restore dependencies cache
+        uses: actions/cache@v3
+        with:
+          path: deps
+          key: ${{ needs.build.outputs.cache-key }}
+      - name: Set up Elixir
+        uses: erlef/setup-beam@61e01a43a562a89bfc54c7f9a378ff67b03e4a21
+        with:
+          elixir-version: '1.15.2'
+          otp-version: '26.0'
       - name: Run formatter
         run: mix format --check-formatted --dry-run
       - name: Run credo
