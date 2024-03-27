@@ -3,6 +3,21 @@ defmodule Swagdox.ConfigTest do
 
   alias Swagdox.Config
 
+  test "new/1" do
+    assert Config.new(openapi_version: "3.0.0") == %Config{openapi_version: "3.0.0"}
+  end
+
+  test "init/0" do
+    assert %Config{
+             openapi_version: "3.0.0",
+             version: "0.1",
+             title: "Swagdox",
+             description: "A library for generating OpenAPI documentation from Elixir code.",
+             servers: ["http://localhost:4000"],
+             router: Swagdox.Router
+           } = Config.init()
+  end
+
   test "openapi_version/0" do
     assert Config.openapi_version() == "3.0.0"
   end

@@ -20,12 +20,12 @@ defmodule Swagdox.Spec do
   @doc """
   Initializes a new OpenAPI specification.
   """
-  @spec init() :: t()
-  def init do
+  @spec init(Config.t()) :: t()
+  def init(config) do
     %__MODULE__{
-      openapi: Config.openapi_version(),
-      info: info(),
-      servers: Config.api_servers(),
+      openapi: config.openapi_version,
+      info: info(config),
+      servers: config.servers,
       paths: [],
       tags: [],
       components: components()
@@ -40,11 +40,11 @@ defmodule Swagdox.Spec do
     %{spec | paths: paths}
   end
 
-  defp info do
+  defp info(config) do
     %{
-      title: Config.api_title(),
-      version: Config.api_version(),
-      description: Config.api_description()
+      title: config.title,
+      version: config.version,
+      description: config.description
     }
   end
 

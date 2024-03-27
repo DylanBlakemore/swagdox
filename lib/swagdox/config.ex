@@ -2,6 +2,33 @@ defmodule Swagdox.Config do
   @moduledoc """
   Configuration for the Swagdox library.
   """
+  defstruct [
+    :openapi_version,
+    :version,
+    :title,
+    :description,
+    :servers,
+    :router
+  ]
+
+  @type t :: %__MODULE__{}
+
+  @spec new(map() | keyword()) :: t()
+  def new(opts) do
+    struct(__MODULE__, opts)
+  end
+
+  @spec init() :: t()
+  def init do
+    new(
+      openapi_version: openapi_version(),
+      version: api_version(),
+      title: api_title(),
+      description: api_description(),
+      servers: api_servers(),
+      router: api_router()
+    )
+  end
 
   @spec openapi_version :: String.t()
   def openapi_version, do: "3.0.0"

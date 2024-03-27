@@ -1,9 +1,12 @@
 defmodule Swagdox.SpecTest do
   use ExUnit.Case
 
+  alias Swagdox.Config
   alias Swagdox.Parameter
   alias Swagdox.Path
   alias Swagdox.Spec
+
+  def spec, do: Spec.init(Config.init())
 
   test "init/0" do
     assert %Spec{
@@ -20,11 +23,11 @@ defmodule Swagdox.SpecTest do
                schemas: [],
                securitySchemes: []
              }
-           } = Spec.init()
+           } = spec()
   end
 
   test "set_paths/2" do
-    spec = Spec.init()
+    spec = spec()
 
     paths = [
       %Path{
@@ -80,7 +83,7 @@ defmodule Swagdox.SpecTest do
     ]
 
     spec =
-      Spec.init()
+      spec()
       |> Spec.set_paths(paths)
 
     {:ok, spec: spec}
