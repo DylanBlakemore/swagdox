@@ -14,6 +14,51 @@ unless we are actively trying to read it, and the code doesn't feel cluttered. W
 
 ### API
 
+Specifying the API for a controller endpoint is similar to specifying examples for ExDoc:
+
+```elixir
+defmodule MyApp.UserController do
+
+  @doc """
+  Returns a User.
+
+  API:
+    @param id(query), integer, "User ID", required: true
+
+    @response 200, User, "User found"
+    @response 403, "User not authorized"
+    @response 404, "User not found"
+  """
+  @spec show(any(), map()) :: nil
+  def show(_conn, _params) do
+    ...
+  end
+end
+```
+
+The above example shows how we can describe parameters and responses. The `API:` tag is what signals
+a specification.
+
+#### Parameters
+
+Parameter specifications must follow the format:
+
+```elixir
+@param name(in), type, description, kwargs
+```
+
+where `kwargs` is a keyword-list of additional arguments used by OpenAPI specs.
+
+#### Responses
+
+Response are described similarly, and must follow one of these formats:
+
+```elixir
+@response code, type, description
+
+@response code, description
+```
+
 ### Schemas
 
 ## Installation
