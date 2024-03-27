@@ -17,8 +17,6 @@ defmodule Swagdox.PathDetector do
   end
 
   @spec build_router_paths(list(Path.route())) :: list(Path.t())
-  def build_router_paths([]), do: []
-
   def build_router_paths(routes) do
     controller_modules =
       routes

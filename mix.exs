@@ -13,7 +13,8 @@ defmodule Swagdox.MixProject do
         summary: [threshold: 95],
         ignore_modules: [
           SwagdoxWeb.Router,
-          SwagdoxWeb.UserController
+          SwagdoxWeb.UserController,
+          SwagdoxWeb.OrderController
         ]
       ]
     ]
