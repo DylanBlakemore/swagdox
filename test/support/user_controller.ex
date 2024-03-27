@@ -3,7 +3,7 @@ defmodule SwagdoxWeb.UserController do
   Returns a User.
 
   API:
-    @param id, integer, required, "User ID"
+    @param id(query), integer, required, "User ID"
 
     @response 200, User, "User found"
     @response 403, "User not authorized"
@@ -24,7 +24,7 @@ defmodule SwagdoxWeb.UserController do
   Creates a User.
 
   API:
-    @param user, map, required, "User attributes"
+    @param user(body), map, required, "User attributes"
 
     @response 201, User, "User created"
     @response 400, "Invalid user attributes"

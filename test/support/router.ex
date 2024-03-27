@@ -50,6 +50,46 @@ defmodule SwagdoxWeb.Router do
         plug_opts: :delete,
         helper: "user_path",
         verb: :delete
+      },
+      %{
+        path: "/orders/:id",
+        metadata: %{},
+        plug: SwagdoxWeb.OrderController,
+        plug_opts: :show,
+        helper: "order_path",
+        verb: :get
+      },
+      %{
+        path: "/orders",
+        metadata: %{},
+        plug: SwagdoxWeb.OrderController,
+        plug_opts: :index,
+        helper: "order_path",
+        verb: :get
+      },
+      %{
+        path: "/orders",
+        metadata: %{},
+        plug: SwagdoxWeb.OrderController,
+        plug_opts: :create,
+        helper: "order_path",
+        verb: :post
+      },
+      %{
+        path: "/orders/:id",
+        metadata: %{},
+        plug: SwagdoxWeb.OrderController,
+        plug_opts: :update,
+        helper: "order_path",
+        verb: :put
+      },
+      %{
+        path: "/orders/:id",
+        metadata: %{},
+        plug: SwagdoxWeb.OrderController,
+        plug_opts: :delete,
+        helper: "order_path",
+        verb: :delete
       }
     ]
   end

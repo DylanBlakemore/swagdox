@@ -29,7 +29,7 @@ defmodule Swagdox.Endpoint do
         @response 403, "User not authorized"
         @response 404, "User not found"
   """
-  @spec extract_all(module()) :: {:ok, t()} | {:error, String.t()}
+  @spec extract_all(module()) :: {:ok, list(t())} | {:error, String.t()}
   def extract_all(module) do
     case extract_function_docs(module) do
       {:error, reason} -> {:error, reason}

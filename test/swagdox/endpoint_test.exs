@@ -21,7 +21,7 @@ defmodule Swagdox.EndpointTest do
              Creates a User.
 
              API:
-               @param user, map, required, "User attributes"
+               @param user(body), map, required, "User attributes"
 
                @response 201, User, "User created"
                @response 400, "Invalid user attributes"
