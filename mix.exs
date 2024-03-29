@@ -8,6 +8,8 @@ defmodule Swagdox.MixProject do
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
+      aliases: aliases(),
+      preferred_cli_env: ["test.all": :test],
       deps: deps(),
       test_coverage: [
         summary: [threshold: 95],
@@ -38,6 +40,22 @@ defmodule Swagdox.MixProject do
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:jason, "~> 1.4"},
       {:ymlr, "~> 5.0"}
+    ]
+  end
+
+  defp aliases do
+    [
+      "test.lint": [
+        "credo --strict",
+        "format --check-formatted --dry-run",
+        "dialyzer"
+      ],
+      "test.all": [
+        "test",
+        "test --cover --export-coverage default",
+        "test.coverage",
+        "test.lint"
+      ]
     ]
   end
 end
