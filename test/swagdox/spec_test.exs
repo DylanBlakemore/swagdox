@@ -6,6 +6,7 @@ defmodule Swagdox.SpecTest do
   alias Swagdox.Path
   alias Swagdox.Spec
 
+  # credo:disable-for-next-line
   def spec, do: Spec.init(Config.init())
 
   test "init/0" do
@@ -24,27 +25,6 @@ defmodule Swagdox.SpecTest do
                securitySchemes: []
              }
            } = spec()
-  end
-
-  test "set_paths/2" do
-    spec = spec()
-
-    paths = [
-      %Path{
-        verb: "get",
-        path: "/users",
-        description: "Returns a list of users."
-      },
-      %Path{
-        verb: "post",
-        path: "/users",
-        description: "Creates a User."
-      }
-    ]
-
-    assert %Spec{
-             paths: ^paths
-           } = Spec.set_paths(spec, paths)
   end
 
   setup do
@@ -82,9 +62,7 @@ defmodule Swagdox.SpecTest do
       }
     ]
 
-    spec =
-      spec()
-      |> Spec.set_paths(paths)
+    spec = %{spec() | paths: paths}
 
     {:ok, spec: spec}
   end
@@ -108,6 +86,19 @@ defmodule Swagdox.SpecTest do
       ]
 
       assert Spec.render(spec)["servers"] == expected_servers
+    end
+
+    test "generate_paths/1" do
+      assert %{
+               paths: [
+                 %Swagdox.Path{path: "/users/:id"},
+                 %Swagdox.Path{path: "/users"},
+                 %Swagdox.Path{path: "/orders/:id"},
+                 %Swagdox.Path{path: "/orders"},
+                 %Swagdox.Path{path: "/orders"},
+                 %Swagdox.Path{path: "/orders/:id"}
+               ]
+             } = Spec.generate_paths(spec())
     end
 
     test "renders the paths", %{spec: spec} do

@@ -10,4 +10,4 @@ Application.put_env(
 )
 
 Application.put_env(:swagdox, :servers, ["http://localhost:4000"])
-Application.put_env(:swagdox, :router, Swagdox.Router)
+Application.put_env(:swagdox, :router, SwagdoxWeb.Router)

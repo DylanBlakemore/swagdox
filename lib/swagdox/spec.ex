@@ -4,18 +4,27 @@ defmodule Swagdox.Spec do
   """
   alias Swagdox.Config
   alias Swagdox.Parameter
-  alias Swagdox.Path
+  alias Swagdox.PathDetector
 
   defstruct [
+    :config,
     :openapi,
-    :info,
-    :servers,
-    :paths,
-    :tags,
-    :components
+    info: %{},
+    servers: [],
+    paths: [],
+    tags: [],
+    components: %{}
   ]
 
-  @type t :: %__MODULE__{}
+  @type t :: %__MODULE__{
+          config: Config.t(),
+          openapi: String.t(),
+          info: map(),
+          servers: list(map()),
+          paths: list(map()),
+          tags: list(map()),
+          components: map()
+        }
 
   @doc """
   Initializes a new OpenAPI specification.
@@ -23,6 +32,7 @@ defmodule Swagdox.Spec do
   @spec init(Config.t()) :: t()
   def init(config) do
     %__MODULE__{
+      config: config,
       openapi: config.openapi_version,
       info: info(config),
       servers: config.servers,
@@ -33,11 +43,14 @@ defmodule Swagdox.Spec do
   end
 
   @doc """
-  Assigns the paths in the specification.
+  Generates the paths for the specification.
   """
-  @spec set_paths(t(), list(Path.t())) :: t()
-  def set_paths(spec, paths) do
-    %{spec | paths: paths}
+  @spec generate_paths(t()) :: t()
+  def generate_paths(spec) do
+    router = spec.config.router
+    paths = PathDetector.build_paths(router)
+
+    %__MODULE__{spec | paths: paths}
   end
 
   defp info(config) do
@@ -89,7 +102,7 @@ defmodule Swagdox.Spec do
     Enum.reduce(grouped_paths, %{}, fn {path, paths}, acc ->
       acc_path =
         Enum.reduce(paths, %{}, fn path, acc_path ->
-          Map.put(acc_path, path.verb, render_path(path))
+          Map.put(acc_path, to_string(path.verb), render_path(path))
         end)
 
       Map.put(acc, path, acc_path)

@@ -14,7 +14,7 @@ defmodule Swagdox.ConfigTest do
              title: "Swagdox",
              description: "A library for generating OpenAPI documentation from Elixir code.",
              servers: ["http://localhost:4000"],
-             router: Swagdox.Router
+             router: SwagdoxWeb.Router
            } = Config.init()
   end
 
@@ -40,6 +40,6 @@ defmodule Swagdox.ConfigTest do
   end
 
   test "api_router/0" do
-    assert Config.api_router() == Swagdox.Router
+    assert Config.api_router() == SwagdoxWeb.Router
   end
 end

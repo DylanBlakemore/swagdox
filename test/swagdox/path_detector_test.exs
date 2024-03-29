@@ -11,6 +11,7 @@ defmodule Swagdox.PathDetectorTest do
   end
 
   defmodule BrokenRouter do
+    # credo:disable-for-next-line
     def __routes__ do
       [
         %{
