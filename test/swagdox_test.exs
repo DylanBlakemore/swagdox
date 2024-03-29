@@ -22,15 +22,7 @@ defmodule SwagdoxTest do
         "post" => %{
           "description" => "Creates an Order.",
           "operationId" => "SwagdoxWeb.OrderController-create",
-          "parameters" => [
-            %{
-              "description" => "Order attributes",
-              "in" => "body",
-              "name" => "order",
-              "required" => true,
-              "schema" => %{"type" => "object"}
-            }
-          ],
+          "parameters" => [],
           "responses" => %{}
         }
       },
@@ -68,15 +60,7 @@ defmodule SwagdoxTest do
         "post" => %{
           "description" => "Creates a User.",
           "operationId" => "SwagdoxWeb.UserController-create",
-          "parameters" => [
-            %{
-              "description" => "User attributes",
-              "in" => "body",
-              "name" => "user",
-              "required" => true,
-              "schema" => %{"type" => "object"}
-            }
-          ],
+          "parameters" => [],
           "responses" => %{}
         }
       },

@@ -29,7 +29,7 @@ defmodule Swagdox.Endpoint do
     |> Enum.map(&build_param/1)
   end
 
-  defp body_param?({:param, [{_, "body"}, _, _]}), do: true
+  defp body_param?({:param, [{_, "body"} | _rest]}), do: true
   defp body_param?(_), do: false
 
   defp build_param({:param, [value, type, description]}) do
