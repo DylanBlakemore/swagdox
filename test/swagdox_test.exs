@@ -58,7 +58,7 @@ defmodule SwagdoxTest do
 
   describe "write_json/2" do
     test "writes a valid OpenAPI specification to a file" do
-      path = "test/fixtures/openapi.json"
+      path = "./openapi.json"
       Swagdox.write_json(Config.init(), path)
 
       assert File.read!(path) == Jason.encode!(@specification, pretty: true)
@@ -69,7 +69,7 @@ defmodule SwagdoxTest do
 
   describe "write_json/1" do
     test "writes a valid OpenAPI specification to a file using the default config" do
-      path = "test/fixtures/openapi.json"
+      path = "./openapi.json"
       Swagdox.write_json(path)
 
       assert File.read!(path) == Jason.encode!(@specification, pretty: true)
@@ -80,7 +80,7 @@ defmodule SwagdoxTest do
 
   describe "write_yaml/2" do
     test "writes a valid OpenAPI specification to a file" do
-      path = "test/fixtures/openapi.yaml"
+      path = "./openapi.yaml"
       Swagdox.write_yaml(Config.init(), path)
 
       assert File.read!(path) == Ymlr.document!(@specification)
@@ -91,7 +91,7 @@ defmodule SwagdoxTest do
 
   describe "write_yaml/1" do
     test "writes a valid OpenAPI specification to a file using the default config" do
-      path = "test/fixtures/openapi.yaml"
+      path = "./openapi.yaml"
       Swagdox.write_yaml(path)
 
       assert File.read!(path) == Ymlr.document!(@specification)
