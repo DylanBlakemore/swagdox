@@ -26,21 +26,21 @@ defmodule Swagdox.Endpoint do
     |> Parser.extract_params()
     |> Enum.map(&Parser.parse_definition/1)
     |> Enum.reject(&body_param?/1)
-    |> Enum.map(&parse_parameter/1)
+    |> Enum.map(&build_param/1)
   end
 
   defp body_param?({:param, [{_, "body"}, _, _]}), do: true
   defp body_param?(_), do: false
 
-  defp parse_parameter({:param, [value, type, description]}) do
+  defp build_param({:param, [value, type, description]}) do
     Parameter.build(value, type, description)
   end
 
-  defp parse_parameter({:param, [value, type, description, opts]}) do
+  defp build_param({:param, [value, type, description, opts]}) do
     Parameter.build(value, type, description, opts)
   end
 
-  defp parse_parameter({:error, reason}), do: raise(ArgumentError, reason)
+  defp build_param({:error, reason}), do: raise(ArgumentError, reason)
 
   @doc """
   Extracts function docs that contain Open API specifications.
