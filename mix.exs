@@ -11,9 +11,11 @@ defmodule Swagdox.MixProject do
       aliases: aliases(),
       preferred_cli_env: ["test.all": :test],
       deps: deps(),
+      dialyzer: [plt_add_apps: [:mix]],
       test_coverage: [
         summary: [threshold: 95],
         ignore_modules: [
+          Mix.Tasks.Swagdox.Generate,
           SwagdoxWeb.DefaultConfig,
           SwagdoxWeb.Router,
           SwagdoxWeb.UserController,
