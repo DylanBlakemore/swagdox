@@ -2,6 +2,10 @@ defmodule Swagdox.Endpoint do
   @moduledoc """
   Describes  a documented endpoint in an application controller.
   """
+
+  alias Swagdox.Parameter
+  alias Swagdox.Parser
+
   defstruct [:module, :function, :docstring]
 
   @type docstring :: String.t()
@@ -12,6 +16,25 @@ defmodule Swagdox.Endpoint do
         }
 
   @locale "en"
+
+  @doc """
+  Returns the parameters for the endpoint.
+  """
+  @spec parameters(t()) :: list(Parameter.t())
+  def parameters(endpoint) do
+    endpoint.docstring
+    |> Parser.extract_params()
+    |> Enum.map(&Parser.parse_definition/1)
+    |> Enum.map(&parse_parameter/1)
+  end
+
+  defp parse_parameter({:param, [value, type, description]}) do
+    Parameter.build(value, type, description)
+  end
+
+  defp parse_parameter({:param, [value, type, description, opts]}) do
+    Parameter.build(value, type, description, opts)
+  end
 
   @doc """
   Extracts function docs that contain Open API specifications.

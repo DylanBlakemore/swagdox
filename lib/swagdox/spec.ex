@@ -4,6 +4,7 @@ defmodule Swagdox.Spec do
   """
   alias Swagdox.Config
   alias Swagdox.Parameter
+  alias Swagdox.Path
   alias Swagdox.PathDetector
 
   defstruct [
@@ -111,6 +112,7 @@ defmodule Swagdox.Spec do
 
   defp render_path(path) do
     %{
+      "operationId" => Path.operation_id(path),
       "description" => path.description,
       "parameters" => render_parameters(path.parameters),
       "responses" => %{}

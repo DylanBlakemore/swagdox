@@ -54,7 +54,7 @@ defmodule Swagdox.Parameter do
     build(name_and_location, type, description, [])
   end
 
-  @spec build(tuple(), String.t(), String.t(), keyword()) :: t()
+  @spec build(tuple() | String.t(), String.t(), String.t(), keyword()) :: t()
   def build({name, location}, type, description, opts) do
     %__MODULE__{
       name: name,
@@ -63,6 +63,10 @@ defmodule Swagdox.Parameter do
       description: description,
       schema: schema(type, opts)
     }
+  end
+
+  def build(name, type, description, opts) do
+    build({name, nil}, type, description, opts)
   end
 
   @doc """

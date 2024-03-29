@@ -2,6 +2,7 @@ defmodule Swagdox.PathTest do
   use ExUnit.Case
 
   alias Swagdox.Endpoint
+  alias Swagdox.Parameter
   alias Swagdox.Path
 
   @create_endpoint %Endpoint{
@@ -11,7 +12,7 @@ defmodule Swagdox.PathTest do
     Creates a User.
 
     API:
-      @query_param user, map, required, "User attributes"
+      @param user, object, "User attributes"
 
       @response 201, User, "User created"
       @response 400, "Invalid user attributes"
@@ -46,6 +47,10 @@ defmodule Swagdox.PathTest do
 
     test "gets the description from the endpoint", %{path: path} do
       assert path.description == "Creates a User."
+    end
+
+    test "creates the parameters", %{path: path} do
+      assert [%Parameter{name: "user"}] = path.parameters
     end
   end
 

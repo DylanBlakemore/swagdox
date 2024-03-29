@@ -17,6 +17,23 @@ defmodule Swagdox.ParserTest do
     assert Parser.extract_description(docstring) == "Creates a User."
   end
 
+  describe "extract_params/1" do
+    test "extracts parameters from a docstring" do
+      docstring = """
+      Creates a User.
+
+      API:
+        @param user, map, "User attributes"
+        @param id, integer, "User ID"
+
+        @response 201, User, "User created"
+      """
+
+      assert Parser.extract_params(docstring) ==
+               ["@param user, map, \"User attributes\"", "@param id, integer, \"User ID\""]
+    end
+  end
+
   describe "parse_definition/1" do
     test "invalid ast" do
       line = "%{hello: :world}"
@@ -43,28 +60,28 @@ defmodule Swagdox.ParserTest do
       line = "@param id(query), integer, \"User ID\", required: true"
 
       assert Parser.parse_definition(line) ==
-               {:ok, {:param, [{"id", "query"}, "integer", "User ID", [required: true]]}}
+               {:param, [{"id", "query"}, "integer", "User ID", [required: true]]}
     end
 
     test "parses a line with optional arguments" do
       line = "@param id(body), integer, \"User ID\""
 
       assert Parser.parse_definition(line) ==
-               {:ok, {:param, [{"id", "body"}, "integer", "User ID"]}}
+               {:param, [{"id", "body"}, "integer", "User ID"]}
     end
 
     test "string-value kwarg" do
       line = "@param id(body), integer, \"User ID\", format: password"
 
       assert Parser.parse_definition(line) ==
-               {:ok, {:param, [{"id", "body"}, "integer", "User ID", [format: "password"]]}}
+               {:param, [{"id", "body"}, "integer", "User ID", [format: "password"]]}
     end
 
     test "complex types" do
       line = "@param id(body), array(integer), \"User ID\""
 
       assert Parser.parse_definition(line) ==
-               {:ok, {:param, [{"id", "body"}, {"array", "integer"}, "User ID"]}}
+               {:param, [{"id", "body"}, {"array", "integer"}, "User ID"]}
     end
   end
 end

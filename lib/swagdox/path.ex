@@ -42,12 +42,17 @@ defmodule Swagdox.Path do
       path: route.path,
       verb: route.verb,
       function: endpoint.function,
-      controller: endpoint.module
+      controller: endpoint.module,
+      parameters: parameters(endpoint)
     }
   end
 
   @spec operation_id(t()) :: String.t()
   def operation_id(path) do
     "#{path.controller}-#{path.function}" |> String.replace("Elixir.", "")
+  end
+
+  defp parameters(endpoint) do
+    Endpoint.parameters(endpoint)
   end
 end

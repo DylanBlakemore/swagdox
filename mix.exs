@@ -53,7 +53,6 @@ defmodule Swagdox.MixProject do
         "dialyzer"
       ],
       "test.all": [
-        "test",
         "test --cover --export-coverage default",
         "test.coverage",
         "test.lint"

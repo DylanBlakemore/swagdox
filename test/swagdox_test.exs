@@ -15,24 +15,86 @@ defmodule SwagdoxTest do
       "/orders" => %{
         "get" => %{
           "description" => "Returns a list of Orders",
+          "operationId" => "SwagdoxWeb.OrderController-index",
           "parameters" => [],
           "responses" => %{}
         },
-        "post" => %{"description" => "Creates an Order.", "parameters" => [], "responses" => %{}}
+        "post" => %{
+          "description" => "Creates an Order.",
+          "operationId" => "SwagdoxWeb.OrderController-create",
+          "parameters" => [
+            %{
+              "description" => "Order attributes",
+              "in" => "body",
+              "name" => "order",
+              "required" => true,
+              "schema" => %{"type" => "object"}
+            }
+          ],
+          "responses" => %{}
+        }
       },
       "/orders/:id" => %{
-        "get" => %{"description" => "Returns an Order.", "parameters" => [], "responses" => %{}},
         "delete" => %{
           "description" => "Deletes an Order.",
-          "parameters" => [],
+          "operationId" => "SwagdoxWeb.OrderController-delete",
+          "parameters" => [
+            %{
+              "description" => "Order ID",
+              "in" => "query",
+              "name" => "id",
+              "required" => true,
+              "schema" => %{"type" => "integer"}
+            }
+          ],
+          "responses" => %{}
+        },
+        "get" => %{
+          "description" => "Returns an Order.",
+          "operationId" => "SwagdoxWeb.OrderController-show",
+          "parameters" => [
+            %{
+              "description" => "Order ID",
+              "in" => "query",
+              "name" => "id",
+              "required" => true,
+              "schema" => %{"type" => "integer"}
+            }
+          ],
           "responses" => %{}
         }
       },
       "/users" => %{
-        "post" => %{"description" => "Creates a User.", "parameters" => [], "responses" => %{}}
+        "post" => %{
+          "description" => "Creates a User.",
+          "operationId" => "SwagdoxWeb.UserController-create",
+          "parameters" => [
+            %{
+              "description" => "User attributes",
+              "in" => "body",
+              "name" => "user",
+              "required" => true,
+              "schema" => %{"type" => "object"}
+            }
+          ],
+          "responses" => %{}
+        }
       },
       "/users/:id" => %{
-        "get" => %{"description" => "Returns a User.", "parameters" => [], "responses" => %{}}
+        "get" => %{
+          "description" => "Returns a User.",
+          "operationId" => "SwagdoxWeb.UserController-show",
+          "parameters" => [
+            %{
+              "description" => "User ID",
+              "in" => "query",
+              "name" => "id",
+              "required" => true,
+              "schema" => %{"type" => "integer"}
+            }
+          ],
+          "responses" => %{}
+        }
       }
     },
     "servers" => [%{"url" => "http://localhost:4000"}],

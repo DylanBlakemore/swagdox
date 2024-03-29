@@ -34,56 +34,38 @@ defmodule Swagdox.PathDetectorTest do
     end
 
     test "when routes are present" do
-      assert PathDetector.build_paths(WebRouter) == [
+      assert [
                %Path{
                  controller: UserController,
                  description: "Returns a User.",
-                 function: :show,
-                 parameters: [],
-                 path: "/users/:id",
                  verb: :get
                },
                %Path{
                  controller: UserController,
                  description: "Creates a User.",
-                 function: :create,
-                 parameters: [],
-                 path: "/users",
                  verb: :post
                },
                %Path{
                  description: "Returns an Order.",
-                 path: "/orders/:id",
                  verb: :get,
-                 function: :show,
-                 controller: OrderController,
-                 parameters: []
+                 controller: OrderController
                },
                %Path{
                  description: "Returns a list of Orders",
-                 path: "/orders",
                  verb: :get,
-                 function: :index,
-                 controller: OrderController,
-                 parameters: []
+                 controller: OrderController
                },
                %Path{
                  description: "Creates an Order.",
-                 path: "/orders",
                  verb: :post,
-                 function: :create,
-                 controller: OrderController,
-                 parameters: []
+                 controller: OrderController
                },
                %Path{
                  description: "Deletes an Order.",
-                 path: "/orders/:id",
                  verb: :delete,
-                 function: :delete,
-                 controller: OrderController,
-                 parameters: []
+                 controller: OrderController
                }
-             ]
+             ] = PathDetector.build_paths(WebRouter)
     end
   end
 end

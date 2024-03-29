@@ -23,6 +23,16 @@ defmodule Swagdox.Parser do
     |> String.trim()
   end
 
+  @spec extract_params(String.t()) :: list(String.t())
+  def extract_params(docstring) do
+    docstring
+    |> String.split("API:\n")
+    |> Enum.at(1)
+    |> String.split("\n")
+    |> Enum.map(&String.trim/1)
+    |> Enum.filter(&String.starts_with?(&1, "@param"))
+  end
+
   @doc """
   Extracts the type of configuration and its value from a line in the Open API specification.
 
@@ -31,11 +41,11 @@ defmodule Swagdox.Parser do
         iex> parse_definition("@param user(query), map, \"User attributes\"")
         {:param, [{"user", "query"}, "map", "User attributes"]}
   """
-  @spec parse_definition(String.t()) :: {:ok, {atom(), list()}} | {:error, String.t()}
+  @spec parse_definition(String.t()) :: {atom(), list()} | {:error, String.t()}
   def parse_definition(line) do
     case to_ast(line) do
       {:ok, {:@, _, [{func, _, params}]}} ->
-        {:ok, {func, parse_ast(params)}}
+        {func, parse_ast(params)}
 
       {:ok, _} ->
         {:error, "Invalid syntax"}

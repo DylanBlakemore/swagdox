@@ -2,6 +2,7 @@ defmodule Swagdox.EndpointTest do
   use ExUnit.Case
 
   alias Swagdox.Endpoint
+  alias Swagdox.Parameter
   alias SwagdoxWeb.UserController
 
   describe "extract_all/1" do
@@ -21,7 +22,7 @@ defmodule Swagdox.EndpointTest do
              Creates a User.
 
              API:
-               @param user(body), map, required, "User attributes"
+               @param user(body), object, "User attributes", required: true
 
                @response 201, User, "User created"
                @response 400, "Invalid user attributes"
@@ -32,6 +33,37 @@ defmodule Swagdox.EndpointTest do
       {:error, reason} = Endpoint.extract_all(NonExistentModule)
 
       assert reason == "Module 'NonExistentModule' not found"
+    end
+  end
+
+  describe "parameters/1" do
+    test "returns the parameters for the endpoint" do
+      endpoint = %Endpoint{
+        module: UserController,
+        function: :create,
+        docstring: """
+        Creates a User.
+
+        API:
+          @param user(body), object, "User attributes"
+          @param id, integer, "User ID", required: true
+
+          @response 201, User, "User created"
+          @response 400, "Invalid user attributes"
+        """
+      }
+
+      parameters = Endpoint.parameters(endpoint)
+
+      assert [
+               %Parameter{
+                 name: "user"
+               },
+               %Parameter{
+                 name: "id",
+                 required: true
+               }
+             ] = parameters
     end
   end
 end

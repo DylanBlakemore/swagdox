@@ -21,6 +21,18 @@ defmodule Swagdox.ParameterTest do
         Parameter.build({"user", "body"}, "invalid", "User attributes")
       end
     end
+
+    test "when the location is not defined" do
+      assert %Swagdox.Parameter{
+               name: "user",
+               in: nil,
+               description: "User attributes",
+               required: false,
+               schema: %{
+                 type: "object"
+               }
+             } = Parameter.build("user", "object", "User attributes")
+    end
   end
 
   test "build/3" do
