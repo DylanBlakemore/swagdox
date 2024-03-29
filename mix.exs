@@ -16,6 +16,7 @@ defmodule Swagdox.MixProject do
         summary: [threshold: 95],
         ignore_modules: [
           Mix.Tasks.Swagdox.Generate,
+          Swagdox.User,
           SwagdoxWeb.DefaultConfig,
           SwagdoxWeb.Router,
           SwagdoxWeb.UserController,
@@ -41,7 +42,8 @@ defmodule Swagdox.MixProject do
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:jason, "~> 1.4"},
-      {:ymlr, "~> 5.0"}
+      {:ymlr, "~> 5.0"},
+      {:ecto, "~> 3.11"}
     ]
   end
 
