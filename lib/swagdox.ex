@@ -17,4 +17,26 @@ defmodule Swagdox do
   def generate_specification do
     generate_specification(Config.init())
   end
+
+  @spec write_json(Config.t(), String.t()) :: :ok
+  def write_json(config, path) do
+    spec = generate_specification(config)
+    File.write!(path, Jason.encode!(spec, pretty: true), [:binary])
+  end
+
+  @spec write_json(String.t()) :: :ok
+  def write_json(path) do
+    write_json(Config.init(), path)
+  end
+
+  @spec write_yaml(Config.t(), String.t()) :: :ok
+  def write_yaml(config, path) do
+    spec = generate_specification(config)
+    File.write!(path, Ymlr.document!(spec), [:binary])
+  end
+
+  @spec write_yaml(String.t()) :: :ok
+  def write_yaml(path) do
+    write_yaml(Config.init(), path)
+  end
 end

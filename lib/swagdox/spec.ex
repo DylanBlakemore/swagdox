@@ -112,7 +112,8 @@ defmodule Swagdox.Spec do
   defp render_path(path) do
     %{
       "description" => path.description,
-      "parameters" => render_parameters(path.parameters)
+      "parameters" => render_parameters(path.parameters),
+      "responses" => %{}
     }
   end
 

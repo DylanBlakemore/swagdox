@@ -13,15 +13,27 @@ defmodule SwagdoxTest do
     "openapi" => "3.0.0",
     "paths" => %{
       "/orders" => %{
-        "get" => %{"description" => "Returns a list of Orders", "parameters" => []},
-        "post" => %{"description" => "Creates an Order.", "parameters" => []}
+        "get" => %{
+          "description" => "Returns a list of Orders",
+          "parameters" => [],
+          "responses" => %{}
+        },
+        "post" => %{"description" => "Creates an Order.", "parameters" => [], "responses" => %{}}
       },
       "/orders/:id" => %{
-        "get" => %{"description" => "Returns an Order.", "parameters" => []},
-        "delete" => %{"description" => "Deletes an Order.", "parameters" => []}
+        "get" => %{"description" => "Returns an Order.", "parameters" => [], "responses" => %{}},
+        "delete" => %{
+          "description" => "Deletes an Order.",
+          "parameters" => [],
+          "responses" => %{}
+        }
       },
-      "/users" => %{"post" => %{"description" => "Creates a User.", "parameters" => []}},
-      "/users/:id" => %{"get" => %{"description" => "Returns a User.", "parameters" => []}}
+      "/users" => %{
+        "post" => %{"description" => "Creates a User.", "parameters" => [], "responses" => %{}}
+      },
+      "/users/:id" => %{
+        "get" => %{"description" => "Returns a User.", "parameters" => [], "responses" => %{}}
+      }
     },
     "servers" => [%{"url" => "http://localhost:4000"}],
     "tags" => []
@@ -41,6 +53,50 @@ defmodule SwagdoxTest do
       spec = Swagdox.generate_specification()
 
       assert spec == @specification
+    end
+  end
+
+  describe "write_json/2" do
+    test "writes a valid OpenAPI specification to a file" do
+      path = "test/fixtures/openapi.json"
+      Swagdox.write_json(Config.init(), path)
+
+      assert File.read!(path) == Jason.encode!(@specification, pretty: true)
+
+      File.rm!(path)
+    end
+  end
+
+  describe "write_json/1" do
+    test "writes a valid OpenAPI specification to a file using the default config" do
+      path = "test/fixtures/openapi.json"
+      Swagdox.write_json(path)
+
+      assert File.read!(path) == Jason.encode!(@specification, pretty: true)
+
+      File.rm!(path)
+    end
+  end
+
+  describe "write_yaml/2" do
+    test "writes a valid OpenAPI specification to a file" do
+      path = "test/fixtures/openapi.yaml"
+      Swagdox.write_yaml(Config.init(), path)
+
+      assert File.read!(path) == Ymlr.document!(@specification)
+
+      File.rm!(path)
+    end
+  end
+
+  describe "write_yaml/1" do
+    test "writes a valid OpenAPI specification to a file using the default config" do
+      path = "test/fixtures/openapi.yaml"
+      Swagdox.write_yaml(path)
+
+      assert File.read!(path) == Ymlr.document!(@specification)
+
+      File.rm!(path)
     end
   end
 end

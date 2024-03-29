@@ -11,7 +11,8 @@ defmodule Swagdox.Path do
     :verb,
     :function,
     :controller,
-    parameters: []
+    parameters: [],
+    responses: []
   ]
 
   @type t :: %__MODULE__{}

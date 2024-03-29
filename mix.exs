@@ -12,6 +12,7 @@ defmodule Swagdox.MixProject do
       test_coverage: [
         summary: [threshold: 95],
         ignore_modules: [
+          SwagdoxWeb.DefaultConfig,
           SwagdoxWeb.Router,
           SwagdoxWeb.UserController,
           SwagdoxWeb.OrderController
@@ -34,7 +35,9 @@ defmodule Swagdox.MixProject do
     [
       {:ex_doc, "~> 0.31", only: :dev, runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:jason, "~> 1.4"},
+      {:ymlr, "~> 5.0"}
     ]
   end
 end
