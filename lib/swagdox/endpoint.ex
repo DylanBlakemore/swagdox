@@ -81,11 +81,12 @@ defmodule Swagdox.Endpoint do
     end
   end
 
-  defp extract_function_doc({{_, _, _}, _, _, :none, _}), do: nil
-
-  defp extract_function_doc({{:function, function, _}, _, _, doc_content, _}) do
+  defp extract_function_doc({{:function, function, _}, _, _, doc_content, _})
+       when is_map(doc_content) do
     {function, Map.get(doc_content, @locale)}
   end
+
+  defp extract_function_doc(_), do: nil
 
   defp api_docs?(nil), do: false
 

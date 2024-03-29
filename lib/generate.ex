@@ -4,16 +4,15 @@ defmodule Mix.Tasks.Swagdox.Generate do
   Generates OpenAPI specification from Elixir function docs.
   """
 
-  use Mix.Task
+  @requirements ["app.config"]
 
-  alias Swagdox.Config
-  alias SwagdoxWeb.DefaultConfig
+  use Mix.Task
 
   @impl Mix.Task
   @spec run(list(String.t())) :: :ok
   def run(args) do
     {parsed, _, _} =
-      OptionParser.parse(args, strict: [output: :string, format: :string, test: :boolean])
+      OptionParser.parse(args, strict: [output: :string, format: :string])
 
     if is_nil(parsed[:output]) do
       raise """
@@ -23,16 +22,13 @@ defmodule Mix.Tasks.Swagdox.Generate do
 
     output = parsed[:output]
     format = parsed[:format] || "json"
-    test = parsed[:test] || false
-
-    config = config(test)
 
     case format do
       "json" ->
-        Swagdox.write_json(config, output)
+        Swagdox.write_json(output)
 
       "yaml" ->
-        Swagdox.write_yaml(config, output)
+        Swagdox.write_yaml(output)
 
       _ ->
         raise """
@@ -40,7 +36,4 @@ defmodule Mix.Tasks.Swagdox.Generate do
         """
     end
   end
-
-  defp config(true), do: DefaultConfig.config()
-  defp config(false), do: Config.init()
 end
