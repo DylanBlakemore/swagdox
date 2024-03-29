@@ -4,9 +4,9 @@ defmodule Mix.Tasks.Swagdox.Generate do
   Generates OpenAPI specification from Elixir function docs.
   """
 
-  @requirements ["app.config"]
-
   use Mix.Task
+
+  @requirements ["app.config"]
 
   @impl Mix.Task
   @spec run(list(String.t())) :: :ok
