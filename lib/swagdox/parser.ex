@@ -3,6 +3,8 @@ defmodule Swagdox.Parser do
   Parses endpoint docstrings to extract Open API specification data.
   """
 
+  @locations ["query", "header", "path", "cookie", "body"]
+
   defmodule ParserError do
     defexception message: "Parser error"
   end
@@ -45,7 +47,7 @@ defmodule Swagdox.Parser do
   def parse_definition(line) do
     case to_ast(line) do
       {:ok, {:@, _, [{func, _, params}]}} ->
-        {func, parse_ast(params)}
+        check_shape({func, parse_ast(params)})
 
       {:ok, _} ->
         {:error, "Invalid syntax"}
@@ -56,6 +58,18 @@ defmodule Swagdox.Parser do
   rescue
     e in ParserError -> {:error, e.message}
   end
+
+  defp check_shape({:param, [name | _rest]}) when not is_tuple(name) do
+    {:error,
+     "Parameter :#{name} missing location. The correct syntax is 'name(location)', where location is one of: #{@locations}"}
+  end
+
+  defp check_shape({:param, [{name, location} | _rest]}) when location not in @locations do
+    {:error,
+     "Invalid location: #{location} for parameter :#{name}. Must be one of: #{@locations}"}
+  end
+
+  defp check_shape(definition), do: definition
 
   defp to_ast(line) do
     case Code.string_to_quoted(line) do

@@ -46,7 +46,7 @@ defmodule Swagdox.EndpointTest do
 
         API:
           @param user(body), object, "User attributes"
-          @param id, integer, "User ID", required: true
+          @param id(path), integer, "User ID", required: true
 
           @response 201, User, "User created"
           @response 400, "Invalid user attributes"

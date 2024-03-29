@@ -35,6 +35,18 @@ defmodule Swagdox.ParserTest do
   end
 
   describe "parse_definition/1" do
+    test "parameter without a location" do
+      line = "@param user, map, \"User attributes\""
+
+      assert {:error, _reason} = Parser.parse_definition(line)
+    end
+
+    test "parameter with an invalid location" do
+      line = "@param user(invalid), map, \"User attributes\""
+
+      assert {:error, _reason} = Parser.parse_definition(line)
+    end
+
     test "invalid ast" do
       line = "%{hello: :world}"
 
@@ -50,7 +62,7 @@ defmodule Swagdox.ParserTest do
     end
 
     test "node error" do
-      line = "@param user, map, %{hello: :world}"
+      line = "@param user(body), map, %{hello: :world}"
 
       assert Parser.parse_definition(line) ==
                {:error, "Unable to parse node: {:%{}, [line: 1], [hello: :world]}"}

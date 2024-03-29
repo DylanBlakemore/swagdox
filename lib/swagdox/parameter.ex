@@ -65,10 +65,6 @@ defmodule Swagdox.Parameter do
     }
   end
 
-  def build(name, type, description, opts) do
-    build({name, nil}, type, description, opts)
-  end
-
   @doc """
   Returns the schema for a Parameter. Raises an ArgumentError if the type is invalid.
 
