@@ -61,7 +61,7 @@ defmodule Swagdox.Parser do
 
   defp check_shape({:param, [name | _rest]}) when not is_tuple(name) do
     {:error,
-     "Parameter :#{name} missing location. The correct syntax is 'name(location)', where location is one of: #{@locations}"}
+     "Parameter :#{name} missing location. The correct syntax is 'name(location)', where location is one of: #{@locations |> Enum.join(", ")}"}
   end
 
   defp check_shape({:param, [{name, location} | _rest]}) when location not in @locations do

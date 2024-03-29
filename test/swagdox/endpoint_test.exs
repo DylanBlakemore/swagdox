@@ -57,13 +57,29 @@ defmodule Swagdox.EndpointTest do
 
       assert [
                %Parameter{
-                 name: "user"
-               },
-               %Parameter{
                  name: "id",
                  required: true
                }
              ] = parameters
+    end
+
+    test "when a parameter has an error" do
+      endpoint = %Endpoint{
+        module: UserController,
+        function: :create,
+        docstring: """
+        Creates a User.
+
+        API:
+          @param user(body), object, "User attributes"
+          @param id(path), integer, "User ID", required: true
+          @param invalid, map, "Invalid parameter"
+        """
+      }
+
+      assert_raise ArgumentError, fn ->
+        Endpoint.parameters(endpoint)
+      end
     end
   end
 end

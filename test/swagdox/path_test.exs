@@ -12,7 +12,7 @@ defmodule Swagdox.PathTest do
     Creates a User.
 
     API:
-      @param user(body), object, "User attributes"
+      @param user(query), object, "User attributes"
 
       @response 201, User, "User created"
       @response 400, "Invalid user attributes"
