@@ -6,11 +6,10 @@ defmodule Swagdox.Response do
 
   defstruct [:status, :description, :content, :options]
 
-  @type content :: %{media_type: String.t(), schema: map(), example: map() | nil}
   @type t :: %__MODULE__{
           status: integer(),
           description: String.t(),
-          content: list(content()) | nil
+          content: map() | nil
         }
 
   @spec build(integer(), String.t() | nil, String.t(), keyword()) :: t()
