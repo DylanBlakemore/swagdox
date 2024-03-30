@@ -77,4 +77,32 @@ defmodule Swagdox.SchemaTest do
   test "name/1" do
     assert Swagdox.Schema.name(%Swagdox.Schema{module: NoFieldsSchema}) == "NoFieldsSchema"
   end
+
+  test "reference/1" do
+    assert Swagdox.Schema.reference(%Swagdox.Schema{module: NoFieldsSchema}) ==
+             "#/components/schemas/NoFieldsSchema"
+  end
+
+  test "render/1" do
+    schema = %Swagdox.Schema{
+      type: "object",
+      module: NoFieldsSchema,
+      properties: [
+        {:id, :binary_id},
+        {:foo, :string},
+        {:bar, :integer}
+      ]
+    }
+
+    assert Swagdox.Schema.render(schema) == %{
+             "NoFieldsSchema" => %{
+               "type" => "object",
+               "properties" => %{
+                 "id" => %{"type" => "binary_id"},
+                 "foo" => %{"type" => "string"},
+                 "bar" => %{"type" => "integer"}
+               }
+             }
+           }
+  end
 end

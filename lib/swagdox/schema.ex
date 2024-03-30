@@ -65,4 +65,27 @@ defmodule Swagdox.Schema do
     |> Module.split()
     |> List.last()
   end
+
+  @spec reference(t()) :: String.t()
+  def reference(schema) do
+    "#/components/schemas/#{name(schema)}"
+  end
+
+  @spec render(t()) :: map()
+  def render(schema) do
+    name = name(schema)
+
+    %{
+      name => %{
+        "type" => schema.type,
+        "properties" => render_properties(schema.properties)
+      }
+    }
+  end
+
+  defp render_properties(properties) do
+    Enum.into(properties, %{}, fn {key, value} ->
+      {to_string(key), %{"type" => to_string(value)}}
+    end)
+  end
 end
