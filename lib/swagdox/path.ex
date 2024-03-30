@@ -39,7 +39,7 @@ defmodule Swagdox.Path do
   def build(endpoint, route) do
     %__MODULE__{
       description: Parser.extract_description(endpoint.docstring),
-      path: route.path,
+      path: adjust_path(route.path),
       verb: route.verb,
       function: endpoint.function,
       controller: endpoint.module,
@@ -54,5 +54,18 @@ defmodule Swagdox.Path do
 
   defp parameters(endpoint) do
     Endpoint.parameters(endpoint)
+  end
+
+  defp adjust_path(path) do
+    path
+    |> String.split("/")
+    |> Enum.map_join("/", &adjust_segment/1)
+  end
+
+  defp adjust_segment(segment) do
+    case String.split(segment, ":") do
+      [_, name] -> "{#{name}}"
+      _ -> segment
+    end
   end
 end

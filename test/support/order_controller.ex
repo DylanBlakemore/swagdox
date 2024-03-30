@@ -3,7 +3,7 @@ defmodule SwagdoxWeb.OrderController do
   Returns an Order.
 
   API:
-    @param id(query), integer, "Order ID", required: true
+    @param id(path), integer, "Order ID", required: true
 
     @response 200, Order, "Order found"
     @response 403, "Order not authorized"
@@ -41,7 +41,7 @@ defmodule SwagdoxWeb.OrderController do
   Deletes an Order.
 
   API:
-    @param id(query), integer, "Order ID", required: true
+    @param id(path), integer, "Order ID", required: true
 
     @response 204, "Order deleted"
     @response 403, "Order not authorized"

@@ -26,14 +26,14 @@ defmodule SwagdoxTest do
           "responses" => %{}
         }
       },
-      "/orders/:id" => %{
+      "/orders/{id}" => %{
         "delete" => %{
           "description" => "Deletes an Order.",
           "operationId" => "SwagdoxWeb.OrderController-delete",
           "parameters" => [
             %{
               "description" => "Order ID",
-              "in" => "query",
+              "in" => "path",
               "name" => "id",
               "required" => true,
               "schema" => %{"type" => "integer"}
@@ -47,7 +47,7 @@ defmodule SwagdoxTest do
           "parameters" => [
             %{
               "description" => "Order ID",
-              "in" => "query",
+              "in" => "path",
               "name" => "id",
               "required" => true,
               "schema" => %{"type" => "integer"}
@@ -64,14 +64,14 @@ defmodule SwagdoxTest do
           "responses" => %{}
         }
       },
-      "/users/:id" => %{
+      "/users/{id}" => %{
         "get" => %{
           "description" => "Returns a User.",
           "operationId" => "SwagdoxWeb.UserController-show",
           "parameters" => [
             %{
               "description" => "User ID",
-              "in" => "query",
+              "in" => "path",
               "name" => "id",
               "required" => true,
               "schema" => %{"type" => "integer"}

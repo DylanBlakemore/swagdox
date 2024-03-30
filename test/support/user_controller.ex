@@ -3,7 +3,7 @@ defmodule SwagdoxWeb.UserController do
   Returns a User.
 
   API:
-    @param id(query), integer, "User ID", required: true
+    @param id(path), integer, "User ID", required: true
 
     @response 200, User, "User found"
     @response 403, "User not authorized"

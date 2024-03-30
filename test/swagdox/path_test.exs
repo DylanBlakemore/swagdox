@@ -26,37 +26,64 @@ defmodule Swagdox.PathTest do
     verb: :post
   }
 
-  setup do
-    path = Path.build(@create_endpoint, @create_route)
+  @show_endpoint %Endpoint{
+    module: SwagdoxWeb.UserController,
+    function: :show,
+    docstring: """
+    Returns a User.
 
-    {:ok, path: path}
+    API:
+      @param id(path), integer, "User ID", required: true
+
+      @response 200, User, "User found"
+      @response 403, "User not authorized"
+      @response 404, "User not found"
+    """
+  }
+
+  @show_route %{
+    path: "/users/:id",
+    plug: SwagdoxWeb.UserController,
+    plug_opts: :show,
+    verb: :get
+  }
+
+  setup do
+    create = Path.build(@create_endpoint, @create_route)
+    show = Path.build(@show_endpoint, @show_route)
+
+    {:ok, create: create, show: show}
   end
 
   describe "build/2" do
-    test "returns a Path", %{path: path} do
-      assert %Path{} = path
+    test "returns a Path", %{create: create} do
+      assert %Path{} = create
     end
 
-    test "gets the path from the route", %{path: path} do
-      assert path.path == "/users"
+    test "gets the path from the route", %{create: create} do
+      assert create.path == "/users"
     end
 
-    test "gets the verb from the route", %{path: path} do
-      assert path.verb == :post
+    test "gets the verb from the route", %{create: create} do
+      assert create.verb == :post
     end
 
-    test "gets the description from the endpoint", %{path: path} do
-      assert path.description == "Creates a User."
+    test "gets the description from the endpoint", %{create: create} do
+      assert create.description == "Creates a User."
     end
 
-    test "creates the parameters", %{path: path} do
-      assert [%Parameter{name: "user"}] = path.parameters
+    test "creates the parameters", %{create: create} do
+      assert [%Parameter{name: "user"}] = create.parameters
+    end
+
+    test "adjusts the path to obey the OpenAPI spec", %{show: show} do
+      assert show.path == "/users/{id}"
     end
   end
 
   describe "operation_id/1" do
-    test "returns the operation ID", %{path: path} do
-      assert Path.operation_id(path) == "SwagdoxWeb.UserController-create"
+    test "returns the operation ID", %{create: create} do
+      assert Path.operation_id(create) == "SwagdoxWeb.UserController-create"
     end
   end
 end

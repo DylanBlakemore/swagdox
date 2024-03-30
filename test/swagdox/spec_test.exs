@@ -41,7 +41,7 @@ defmodule Swagdox.SpecTest do
       },
       %Path{
         verb: "get",
-        path: "/users/:id",
+        path: "/users/{id}",
         description: "Returns a User.",
         parameters: [
           %Parameter{
@@ -91,12 +91,12 @@ defmodule Swagdox.SpecTest do
     test "generate_paths/1" do
       assert %{
                paths: [
-                 %Swagdox.Path{path: "/users/:id"},
+                 %Swagdox.Path{path: "/users/{id}"},
                  %Swagdox.Path{path: "/users"},
-                 %Swagdox.Path{path: "/orders/:id"},
+                 %Swagdox.Path{path: "/orders/{id}"},
                  %Swagdox.Path{path: "/orders"},
                  %Swagdox.Path{path: "/orders"},
-                 %Swagdox.Path{path: "/orders/:id"}
+                 %Swagdox.Path{path: "/orders/{id}"}
                ]
              } = Spec.generate_paths(spec())
     end
@@ -111,7 +111,7 @@ defmodule Swagdox.SpecTest do
                    "description" => "Creates a User."
                  }
                },
-               "/users/:id" => %{
+               "/users/{id}" => %{
                  "get" => %{
                    "description" => "Returns a User.",
                    "parameters" => [
