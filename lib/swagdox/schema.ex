@@ -2,11 +2,12 @@ defmodule Swagdox.Schema do
   @moduledoc """
   This module provides a way to extract the fields and types of an Ecto.Schema.
   """
-  defstruct [:type, properties: %{}, required: []]
+  defstruct [:module, :type, properties: %{}, required: []]
 
   @type property :: {atom(), atom()}
   @type t :: %__MODULE__{
           type: String.t(),
+          module: module(),
           properties: list(property()),
           required: list(atom())
         }
@@ -42,7 +43,11 @@ defmodule Swagdox.Schema do
 
   @spec infer(module()) :: t()
   def infer(module) do
-    %__MODULE__{type: "object", properties: properties(module)}
+    %__MODULE__{
+      module: module,
+      type: "object",
+      properties: properties(module)
+    }
   end
 
   @spec properties(module()) :: list(property())
@@ -52,5 +57,12 @@ defmodule Swagdox.Schema do
     Enum.map(properties, fn property ->
       {property, schema.__schema__(:type, property)}
     end)
+  end
+
+  @spec name(t()) :: String.t()
+  def name(schema) do
+    schema.module
+    |> Module.split()
+    |> List.last()
   end
 end

@@ -57,6 +57,7 @@ defmodule Swagdox.SchemaTest do
   test "infer/1" do
     assert Swagdox.Schema.infer(NoFieldsSchema) == %Swagdox.Schema{
              type: "object",
+             module: NoFieldsSchema,
              properties: [
                {:id, :binary_id},
                {:foo, :string},
@@ -66,9 +67,14 @@ defmodule Swagdox.SchemaTest do
 
     assert Swagdox.Schema.infer(WithFieldsSchema) == %Swagdox.Schema{
              type: "object",
+             module: WithFieldsSchema,
              properties: [
                {:foo, :string}
              ]
            }
+  end
+
+  test "name/1" do
+    assert Swagdox.Schema.name(%Swagdox.Schema{module: NoFieldsSchema}) == "NoFieldsSchema"
   end
 end
