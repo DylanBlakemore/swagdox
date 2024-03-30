@@ -85,7 +85,10 @@ defmodule Swagdox.Schema do
 
   defp render_properties(properties) do
     Enum.into(properties, %{}, fn {key, value} ->
-      {to_string(key), %{"type" => to_string(value)}}
+      {to_string(key), %{"type" => type(value)}}
     end)
   end
+
+  defp type(:binary_id), do: "string"
+  defp type(type), do: to_string(type)
 end

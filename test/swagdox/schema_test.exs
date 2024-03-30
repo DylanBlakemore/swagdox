@@ -98,7 +98,7 @@ defmodule Swagdox.SchemaTest do
              "NoFieldsSchema" => %{
                "type" => "object",
                "properties" => %{
-                 "id" => %{"type" => "binary_id"},
+                 "id" => %{"type" => "string"},
                  "foo" => %{"type" => "string"},
                  "bar" => %{"type" => "integer"}
                }
