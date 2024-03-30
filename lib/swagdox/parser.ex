@@ -27,12 +27,21 @@ defmodule Swagdox.Parser do
 
   @spec extract_params(String.t()) :: list(String.t())
   def extract_params(docstring) do
+    extract_elements(docstring, "@param")
+  end
+
+  @spec extract_responses(String.t()) :: list(String.t())
+  def extract_responses(docstring) do
+    extract_elements(docstring, "@response")
+  end
+
+  defp extract_elements(docstring, prefix) do
     docstring
     |> String.split("API:\n")
     |> Enum.at(1)
     |> String.split("\n")
     |> Enum.map(&String.trim/1)
-    |> Enum.filter(&String.starts_with?(&1, "@param"))
+    |> Enum.filter(&String.starts_with?(&1, prefix))
   end
 
   @doc """
@@ -69,6 +78,10 @@ defmodule Swagdox.Parser do
      "Invalid location: #{location} for parameter :#{name}. Must be one of: #{@locations}"}
   end
 
+  defp check_shape({:response, [status | _rest]}) when not is_integer(status) do
+    {:error, "Response status must be an integer"}
+  end
+
   defp check_shape(definition), do: definition
 
   defp to_ast(line) do
@@ -83,6 +96,10 @@ defmodule Swagdox.Parser do
   end
 
   defp parse_node({value, _meta, nil}) do
+    to_string(value)
+  end
+
+  defp parse_node({:__aliases__, _meta, [value]}) do
     to_string(value)
   end
 

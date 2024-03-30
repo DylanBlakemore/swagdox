@@ -90,6 +90,23 @@ defmodule Swagdox.Parameter do
 
   @doc """
   Renders a Parameter as a map.
+
+  Examples:
+
+        iex> Swagdox.Parameter.render(%Swagdox.Parameter{
+        ...>   name: "id",
+        ...>   in: "query",
+        ...>   required: false,
+        ...>   description: "User ID",
+        ...>   schema: %{type: "integer"}
+        ...> })
+        %{
+          "name" => "id",
+          "in" => "query",
+          "required" => false,
+          "description" => "User ID",
+          "schema" => %{"type" => "integer"}
+        }
   """
   @spec render(t()) :: map()
   def render(parameter) do

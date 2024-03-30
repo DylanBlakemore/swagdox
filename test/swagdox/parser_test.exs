@@ -34,7 +34,53 @@ defmodule Swagdox.ParserTest do
     end
   end
 
+  describe "extract_responses/1" do
+    test "extracts responses from a docstring" do
+      docstring = """
+      Creates a User.
+
+      API:
+        @param user, map, "User attributes"
+
+        @response 201, User, "User created"
+        @response 400, "Invalid user attributes"
+      """
+
+      assert Parser.extract_responses(docstring) ==
+               [
+                 "@response 201, User, \"User created\"",
+                 "@response 400, \"Invalid user attributes\""
+               ]
+    end
+  end
+
   describe "parse_definition/1" do
+    test "response" do
+      line = "@response 201, User, \"User created\""
+
+      assert Parser.parse_definition(line) ==
+               {:response, [201, "User", "User created"]}
+    end
+
+    test "response with options" do
+      line = "@response 201, User, \"User created\", properties: [id, name]"
+
+      assert Parser.parse_definition(line) ==
+               {:response, [201, "User", "User created", [properties: ["id", "name"]]]}
+    end
+
+    test "response without a status" do
+      line = "@response User, \"User created\""
+
+      assert {:error, _reason} = Parser.parse_definition(line)
+    end
+
+    test "with a non-numeric status" do
+      line = "@response hello, User, \"User created\""
+
+      assert {:error, _reason} = Parser.parse_definition(line)
+    end
+
     test "parameter without a location" do
       line = "@param user, map, \"User attributes\""
 
