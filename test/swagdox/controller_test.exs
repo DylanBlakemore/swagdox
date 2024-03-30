@@ -5,13 +5,13 @@ defmodule Swagdox.ControllerTest do
 
   defmodule TestController do
     use Controller,
-      schemas: [Swagdox.User],
+      schemas: [Swagdox.User, Swagdox.Post],
       auth: :header,
       token: "X-HEADER-TOKEN"
   end
 
   test "controller schemas" do
-    assert TestController.__schemas__() == [Swagdox.User]
+    assert TestController.__schemas__() == [Swagdox.User, Swagdox.Post]
   end
 
   test "controller security" do

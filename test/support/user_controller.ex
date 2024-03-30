@@ -1,4 +1,9 @@
 defmodule SwagdoxWeb.UserController do
+  use Swagdox.Controller,
+    schemas: [Swagdox.User],
+    auth: :header,
+    token: "X-HEADER-TOKEN"
+
   @doc """
   Returns a User.
 
