@@ -15,6 +15,8 @@ defmodule Swagdox.Config do
 
   @spec new(map() | keyword()) :: t()
   def new(opts) do
+    opts = Enum.into(opts, %{openapi_version: openapi_version()})
+
     struct(__MODULE__, opts)
   end
 
