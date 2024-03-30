@@ -20,7 +20,12 @@ defmodule SwagdoxTest do
           "responses" => %{
             "200" => %{
               "content" => %{
-                "application/json" => %{"schema" => %{"$ref" => "#/components/schemas/Order"}}
+                "application/json" => %{
+                  "schema" => %{
+                    "items" => %{"$ref" => "#/components/schemas/Order"},
+                    "type" => "array"
+                  }
+                }
               },
               "description" => "Orders found"
             },

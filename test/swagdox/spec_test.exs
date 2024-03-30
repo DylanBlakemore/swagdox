@@ -116,7 +116,10 @@ defmodule Swagdox.SpecTest do
                      "200" => %{
                        "content" => %{
                          "application/json" => %{
-                           "schema" => %{"$ref" => "#/components/schemas/User"}
+                           "schema" => %{
+                             "type" => "array",
+                             "items" => %{"$ref" => "#/components/schemas/User"}
+                           }
                          }
                        },
                        "description" => "List of users"

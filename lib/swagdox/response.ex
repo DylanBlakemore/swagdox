@@ -39,16 +39,25 @@ defmodule Swagdox.Response do
 
   defp build_content(nil, _options), do: nil
 
-  # We need to account for array types. In that case, the schema here
-  # would be formatted as `[User]`.
+  defp build_content([schema], _options) do
+    [
+      %{
+        media_type: "application/json",
+        schema: %{
+          type: "array",
+          ref: Schema.reference(schema)
+        }
+      }
+    ]
+  end
+
   defp build_content(schema, _options) do
     [
       %{
         media_type: "application/json",
         schema: %{
           ref: Schema.reference(schema)
-        },
-        example: nil
+        }
       }
     ]
   end
@@ -104,10 +113,14 @@ defmodule Swagdox.Response do
       rendered =
         %{}
         |> put_schema(value.schema)
-        |> put_example(value.example)
+        |> put_example(value[:example])
 
       Map.put(acc, value.media_type, rendered)
     end)
+  end
+
+  defp put_schema(content, %{type: "array", ref: ref}) do
+    Map.put(content, "schema", %{"type" => "array", "items" => %{"$ref" => ref}})
   end
 
   defp put_schema(content, %{ref: ref}) do

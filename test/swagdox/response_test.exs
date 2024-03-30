@@ -18,8 +18,7 @@ defmodule Swagdox.ResponseTest do
                  media_type: "application/json",
                  schema: %{
                    ref: "#/components/schemas/User"
-                 },
-                 example: nil
+                 }
                }
              ]
     end
@@ -40,8 +39,27 @@ defmodule Swagdox.ResponseTest do
                  media_type: "application/json",
                  schema: %{
                    ref: "#/components/schemas/User"
-                 },
-                 example: nil
+                 }
+               }
+             ]
+    end
+
+    test "builds a respnse with an array type" do
+      response = Response.build(200, ["User"], "OK")
+
+      assert %Response{
+               status: 200,
+               description: "OK",
+               options: []
+             } = response
+
+      assert response.content == [
+               %{
+                 media_type: "application/json",
+                 schema: %{
+                   type: "array",
+                   ref: "#/components/schemas/User"
+                 }
                }
              ]
     end
@@ -99,6 +117,39 @@ defmodule Swagdox.ResponseTest do
                    "application/json" => %{
                      "schema" => %{
                        "$ref" => "#/components/schemas/User"
+                     }
+                   }
+                 }
+               }
+             }
+    end
+
+    test "content with an array schema" do
+      response = %Response{
+        status: 200,
+        description: "OK",
+        content: [
+          %{
+            media_type: "application/json",
+            schema: %{
+              type: "array",
+              ref: "#/components/schemas/User"
+            },
+            example: nil
+          }
+        ]
+      }
+
+      assert Response.render(response) == %{
+               "200" => %{
+                 "description" => "OK",
+                 "content" => %{
+                   "application/json" => %{
+                     "schema" => %{
+                       "type" => "array",
+                       "items" => %{
+                         "$ref" => "#/components/schemas/User"
+                       }
                      }
                    }
                  }
