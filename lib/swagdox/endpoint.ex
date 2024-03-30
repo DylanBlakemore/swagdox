@@ -5,7 +5,6 @@ defmodule Swagdox.Endpoint do
 
   alias Swagdox.Parameter
   alias Swagdox.Parser
-  # alias Swagdox.Response
 
   defstruct [:module, :function, :docstring]
 
