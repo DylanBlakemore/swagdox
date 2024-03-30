@@ -2,6 +2,25 @@ defmodule Mix.Tasks.Swagdox.Generate do
   @shortdoc "Generates OpenAPI specification from Elixir function docs."
   @moduledoc """
   Generates OpenAPI specification from Elixir function docs.
+
+  Command line options can be used to specify the output title, version, description, servers,
+  and router module for the OpenAPI specification. However, if these options are not provided, the
+  values will attempt to be fetched from the application config.
+
+  ## Usage
+
+      mix swagdox.generate --output path/to/output.json
+      mix swagdox.generate -o path/to/output.json
+
+  ## Options
+
+  * `--output` - (required) The path to write the output file.
+  * `--format` - The format of the output file. Default is `json`.
+  * `--title` - The title of the API.
+  * `--version` - The version of the API.
+  * `--description` - The description of the API.
+  * `--servers` - The servers of the API.
+  * `--router` - The router module to use.
   """
 
   use Mix.Task
