@@ -78,9 +78,15 @@ defmodule Swagdox.SchemaTest do
     assert Swagdox.Schema.name(%Swagdox.Schema{module: NoFieldsSchema}) == "NoFieldsSchema"
   end
 
-  test "reference/1" do
-    assert Swagdox.Schema.reference(%Swagdox.Schema{module: NoFieldsSchema}) ==
-             "#/components/schemas/NoFieldsSchema"
+  describe "reference/1" do
+    test "with a schema" do
+      assert Swagdox.Schema.reference(%Swagdox.Schema{module: NoFieldsSchema}) ==
+               "#/components/schemas/NoFieldsSchema"
+    end
+
+    test "with a string" do
+      assert Swagdox.Schema.reference("NoFieldsSchema") == "#/components/schemas/NoFieldsSchema"
+    end
   end
 
   test "render/1" do

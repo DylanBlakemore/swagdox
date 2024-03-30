@@ -66,9 +66,15 @@ defmodule Swagdox.Schema do
     |> List.last()
   end
 
-  @spec reference(t()) :: String.t()
-  def reference(schema) do
-    "#/components/schemas/#{name(schema)}"
+  @spec reference(t() | String.t()) :: String.t()
+  def reference(%__MODULE__{} = schema) do
+    schema
+    |> name()
+    |> reference()
+  end
+
+  def reference(name) do
+    "#/components/schemas/#{name}"
   end
 
   @spec render(t()) :: map()
