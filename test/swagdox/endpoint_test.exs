@@ -3,6 +3,7 @@ defmodule Swagdox.EndpointTest do
 
   alias Swagdox.Endpoint
   alias Swagdox.Parameter
+  alias Swagdox.Response
   alias SwagdoxWeb.UserController
 
   describe "extract_all/1" do
@@ -80,6 +81,39 @@ defmodule Swagdox.EndpointTest do
       assert_raise ArgumentError, fn ->
         Endpoint.parameters(endpoint)
       end
+    end
+  end
+
+  describe "responses/1" do
+    test "returns the responses for the endpoint" do
+      endpoint = %Endpoint{
+        module: UserController,
+        function: :create,
+        docstring: """
+        Creates a User.
+
+        API:
+          @param user(body), object, "User attributes"
+          @param id(path), integer, "User ID", required: true
+
+          @response 201, User, "User created", content_type: "application/json"
+          @response 400, "Invalid user attributes"
+        """
+      }
+
+      responses = Endpoint.responses(endpoint)
+
+      assert [
+               %Response{
+                 status: 201,
+                 description: "User created",
+                 options: [content_type: "application/json"]
+               },
+               %Response{
+                 status: 400,
+                 description: "Invalid user attributes"
+               }
+             ] = responses
     end
   end
 end

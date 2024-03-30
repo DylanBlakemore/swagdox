@@ -55,6 +55,13 @@ defmodule Swagdox.ParserTest do
   end
 
   describe "parse_definition/1" do
+    test "list types" do
+      line = "@response 200, [User], \"List of users\""
+
+      assert Parser.parse_definition(line) ==
+               {:response, [200, ["User"], "List of users"]}
+    end
+
     test "response" do
       line = "@response 201, User, \"User created\""
 

@@ -43,7 +43,8 @@ defmodule Swagdox.Path do
       verb: route.verb,
       function: endpoint.function,
       controller: endpoint.module,
-      parameters: parameters(endpoint)
+      parameters: parameters(endpoint),
+      responses: responses(endpoint)
     }
   end
 
@@ -54,6 +55,10 @@ defmodule Swagdox.Path do
 
   defp parameters(endpoint) do
     Endpoint.parameters(endpoint)
+  end
+
+  defp responses(endpoint) do
+    Endpoint.responses(endpoint)
   end
 
   defp adjust_path(path) do

@@ -17,13 +17,29 @@ defmodule SwagdoxTest do
           "description" => "Returns a list of Orders",
           "operationId" => "SwagdoxWeb.OrderController-index",
           "parameters" => [],
-          "responses" => %{}
+          "responses" => %{
+            "200" => %{
+              "content" => %{
+                "application/json" => %{"schema" => %{"$ref" => "#/components/schemas/Order"}}
+              },
+              "description" => "Orders found"
+            },
+            "403" => %{"description" => "Orders not authorized"}
+          }
         },
         "post" => %{
           "description" => "Creates an Order.",
           "operationId" => "SwagdoxWeb.OrderController-create",
           "parameters" => [],
-          "responses" => %{}
+          "responses" => %{
+            "201" => %{
+              "content" => %{
+                "application/json" => %{"schema" => %{"$ref" => "#/components/schemas/Order"}}
+              },
+              "description" => "Order created"
+            },
+            "400" => %{"description" => "Invalid order attributes"}
+          }
         }
       },
       "/orders/{id}" => %{
@@ -39,7 +55,11 @@ defmodule SwagdoxTest do
               "schema" => %{"type" => "integer"}
             }
           ],
-          "responses" => %{}
+          "responses" => %{
+            "204" => %{"description" => "Order deleted"},
+            "403" => %{"description" => "Order not authorized"},
+            "404" => %{"description" => "Order not found"}
+          }
         },
         "get" => %{
           "description" => "Returns an Order.",
@@ -53,7 +73,16 @@ defmodule SwagdoxTest do
               "schema" => %{"type" => "integer"}
             }
           ],
-          "responses" => %{}
+          "responses" => %{
+            "200" => %{
+              "content" => %{
+                "application/json" => %{"schema" => %{"$ref" => "#/components/schemas/Order"}}
+              },
+              "description" => "Order found"
+            },
+            "403" => %{"description" => "Order not authorized"},
+            "404" => %{"description" => "Order not found"}
+          }
         }
       },
       "/users" => %{
@@ -61,7 +90,15 @@ defmodule SwagdoxTest do
           "description" => "Creates a User.",
           "operationId" => "SwagdoxWeb.UserController-create",
           "parameters" => [],
-          "responses" => %{}
+          "responses" => %{
+            "201" => %{
+              "content" => %{
+                "application/json" => %{"schema" => %{"$ref" => "#/components/schemas/User"}}
+              },
+              "description" => "User created"
+            },
+            "400" => %{"description" => "Invalid user attributes"}
+          }
         }
       },
       "/users/{id}" => %{
@@ -77,7 +114,16 @@ defmodule SwagdoxTest do
               "schema" => %{"type" => "integer"}
             }
           ],
-          "responses" => %{}
+          "responses" => %{
+            "200" => %{
+              "content" => %{
+                "application/json" => %{"schema" => %{"$ref" => "#/components/schemas/User"}}
+              },
+              "description" => "User found"
+            },
+            "403" => %{"description" => "User not authorized"},
+            "404" => %{"description" => "User not found"}
+          }
         }
       }
     },

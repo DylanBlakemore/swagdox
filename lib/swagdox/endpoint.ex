@@ -5,6 +5,7 @@ defmodule Swagdox.Endpoint do
 
   alias Swagdox.Parameter
   alias Swagdox.Parser
+  alias Swagdox.Response
 
   defstruct [:module, :function, :docstring]
 
@@ -41,6 +42,29 @@ defmodule Swagdox.Endpoint do
   end
 
   defp build_param({:error, reason}), do: raise(ArgumentError, reason)
+
+  @doc """
+  Returns the responses for the endpoint.
+  """
+  @spec responses(t()) :: list(Response.t())
+  def responses(endpoint) do
+    endpoint.docstring
+    |> Parser.extract_responses()
+    |> Enum.map(&Parser.parse_definition/1)
+    |> Enum.map(&build_response/1)
+  end
+
+  defp build_response({:response, [status, schema, description]}) do
+    Response.build(status, schema, description)
+  end
+
+  defp build_response({:response, [status, schema, description, opts]}) do
+    Response.build(status, schema, description, opts)
+  end
+
+  defp build_response({:response, [status, description]}) do
+    Response.build(status, description)
+  end
 
   @doc """
   Extracts function docs that contain Open API specifications.

@@ -4,6 +4,7 @@ defmodule Swagdox.SpecTest do
   alias Swagdox.Config
   alias Swagdox.Parameter
   alias Swagdox.Path
+  alias Swagdox.Response
   alias Swagdox.Spec
 
   # credo:disable-for-next-line
@@ -32,12 +33,17 @@ defmodule Swagdox.SpecTest do
       %Path{
         verb: "get",
         path: "/users",
-        description: "Returns a list of users."
+        description: "Returns a list of users.",
+        responses: [Response.build(200, ["User"], "List of users")]
       },
       %Path{
         verb: "post",
         path: "/users",
-        description: "Creates a User."
+        description: "Creates a User.",
+        responses: [
+          Response.build(201, "User", "User created"),
+          Response.build(400, "Invalid user attributes")
+        ]
       },
       %Path{
         verb: "get",
@@ -105,10 +111,31 @@ defmodule Swagdox.SpecTest do
       assert %{
                "/users" => %{
                  "get" => %{
-                   "description" => "Returns a list of users."
+                   "description" => "Returns a list of users.",
+                   "responses" => %{
+                     "200" => %{
+                       "content" => %{
+                         "application/json" => %{
+                           "schema" => %{"$ref" => "#/components/schemas/User"}
+                         }
+                       },
+                       "description" => "List of users"
+                     }
+                   }
                  },
                  "post" => %{
-                   "description" => "Creates a User."
+                   "description" => "Creates a User.",
+                   "responses" => %{
+                     "201" => %{
+                       "content" => %{
+                         "application/json" => %{
+                           "schema" => %{"$ref" => "#/components/schemas/User"}
+                         }
+                       },
+                       "description" => "User created"
+                     },
+                     "400" => %{"description" => "Invalid user attributes"}
+                   }
                  }
                },
                "/users/{id}" => %{
@@ -124,12 +151,14 @@ defmodule Swagdox.SpecTest do
                          "type" => "string"
                        }
                      }
-                   ]
+                   ],
+                   "responses" => %{}
                  }
                },
                "/orders" => %{
                  "get" => %{
-                   "description" => "Returns a list of orders."
+                   "description" => "Returns a list of orders.",
+                   "responses" => %{}
                  }
                }
              } = Spec.render(spec)["paths"]

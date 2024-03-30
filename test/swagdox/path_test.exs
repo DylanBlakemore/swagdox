@@ -4,6 +4,7 @@ defmodule Swagdox.PathTest do
   alias Swagdox.Endpoint
   alias Swagdox.Parameter
   alias Swagdox.Path
+  alias Swagdox.Response
 
   @create_endpoint %Endpoint{
     module: SwagdoxWeb.UserController,
@@ -74,6 +75,10 @@ defmodule Swagdox.PathTest do
 
     test "creates the parameters", %{create: create} do
       assert [%Parameter{name: "user"}] = create.parameters
+    end
+
+    test "creates the responses", %{create: create} do
+      assert [%Response{status: 201}, %Response{status: 400}] = create.responses
     end
 
     test "adjusts the path to obey the OpenAPI spec", %{show: show} do

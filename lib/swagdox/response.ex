@@ -40,6 +40,8 @@ defmodule Swagdox.Response do
 
   defp build_content(nil, _options), do: nil
 
+  # We need to account for array types. In that case, the schema here
+  # would be formatted as `[User]`.
   defp build_content(schema, _options) do
     [
       %{

@@ -6,6 +6,7 @@ defmodule Swagdox.Spec do
   alias Swagdox.Parameter
   alias Swagdox.Path
   alias Swagdox.PathDetector
+  alias Swagdox.Response
 
   defstruct [
     :config,
@@ -115,11 +116,21 @@ defmodule Swagdox.Spec do
       "operationId" => Path.operation_id(path),
       "description" => path.description,
       "parameters" => render_parameters(path.parameters),
-      "responses" => %{}
+      "responses" => render_responses(path.responses)
     }
   end
 
   defp render_parameters(parameters) do
     Enum.map(parameters, &Parameter.render/1)
+  end
+
+  defp render_responses(responses) do
+    case Enum.map(responses, &Response.render/1) do
+      [] ->
+        %{}
+
+      responses ->
+        Enum.reduce(responses, &Map.merge/2)
+    end
   end
 end

@@ -17,7 +17,7 @@ defmodule SwagdoxWeb.OrderController do
   Returns a list of Orders
 
   API:
-    @response 200, list(Order), "Orders found"
+    @response 200, [Order], "Orders found"
     @response 403, "Orders not authorized"
   """
   @spec index(any(), map()) :: nil
