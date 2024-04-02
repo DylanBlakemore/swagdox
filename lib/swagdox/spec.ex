@@ -5,8 +5,10 @@ defmodule Swagdox.Spec do
   alias Swagdox.Config
   alias Swagdox.Parameter
   alias Swagdox.Path
-  alias Swagdox.PathDetector
+  alias Swagdox.PathBuilder
   alias Swagdox.Response
+  alias Swagdox.Schema
+  alias Swagdox.SchemaBuilder
 
   defstruct [
     :config,
@@ -15,7 +17,8 @@ defmodule Swagdox.Spec do
     servers: [],
     paths: [],
     tags: [],
-    components: %{}
+    schemas: [],
+    security: []
   ]
 
   @type t :: %__MODULE__{
@@ -25,7 +28,8 @@ defmodule Swagdox.Spec do
           servers: list(map()),
           paths: list(map()),
           tags: list(map()),
-          components: map()
+          schemas: list(),
+          security: list()
         }
 
   @doc """
@@ -40,7 +44,8 @@ defmodule Swagdox.Spec do
       servers: config.servers,
       paths: [],
       tags: [],
-      components: components()
+      schemas: [],
+      security: []
     }
   end
 
@@ -50,9 +55,20 @@ defmodule Swagdox.Spec do
   @spec generate_paths(t()) :: t()
   def generate_paths(spec) do
     router = spec.config.router
-    paths = PathDetector.build_paths(router)
+    paths = PathBuilder.build_paths(router)
 
     %__MODULE__{spec | paths: paths}
+  end
+
+  @doc """
+  Generates the schemas for the specification.
+  """
+  @spec generate_schemas(t()) :: t()
+  def generate_schemas(spec) do
+    router = spec.config.router
+    schemas = SchemaBuilder.build_schemas(router)
+
+    %__MODULE__{spec | schemas: schemas}
   end
 
   defp info(config) do
@@ -60,13 +76,6 @@ defmodule Swagdox.Spec do
       title: config.title,
       version: config.version,
       description: config.description
-    }
-  end
-
-  defp components do
-    %{
-      schemas: [],
-      securitySchemes: []
     }
   end
 
@@ -78,8 +87,16 @@ defmodule Swagdox.Spec do
       "servers" => render_servers(spec.servers),
       "paths" => render_paths(spec.paths),
       "tags" => [],
-      "components" => %{}
+      "components" => %{
+        "schemas" => render_schemas(spec.schemas)
+      }
     }
+  end
+
+  defp render_schemas(schemas) do
+    Enum.reduce(schemas, %{}, fn schema, acc ->
+      Map.merge(acc, Schema.render(schema))
+    end)
   end
 
   defp render_info(info) do

@@ -4,7 +4,26 @@ defmodule SwagdoxTest do
   alias Swagdox.Config
 
   @specification %{
-    "components" => %{},
+    "components" => %{
+      "schemas" => %{
+        "Order" => %{
+          "properties" => %{
+            "id" => %{"type" => "string"},
+            "item" => %{"type" => "string"},
+            "number" => %{"type" => "integer"}
+          },
+          "type" => "object"
+        },
+        "User" => %{
+          "properties" => %{
+            "email" => %{"type" => "string"},
+            "id" => %{"type" => "string"},
+            "name" => %{"type" => "string"}
+          },
+          "type" => "object"
+        }
+      }
+    },
     "info" => %{
       "description" => "A library for generating OpenAPI documentation from Elixir code.",
       "title" => "Swagdox",

@@ -1,4 +1,4 @@
-defmodule Swagdox.PathDetector do
+defmodule Swagdox.PathBuilder do
   @moduledoc """
   Builds paths from a router by calling the __routes__ function.
 

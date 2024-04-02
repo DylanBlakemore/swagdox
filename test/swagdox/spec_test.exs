@@ -5,6 +5,7 @@ defmodule Swagdox.SpecTest do
   alias Swagdox.Parameter
   alias Swagdox.Path
   alias Swagdox.Response
+  alias Swagdox.Schema
   alias Swagdox.Spec
 
   # credo:disable-for-next-line
@@ -21,10 +22,8 @@ defmodule Swagdox.SpecTest do
              servers: [_server],
              paths: [],
              tags: [],
-             components: %{
-               schemas: [],
-               securitySchemes: []
-             }
+             schemas: [],
+             security: []
            } = spec()
   end
 
@@ -73,6 +72,42 @@ defmodule Swagdox.SpecTest do
     {:ok, spec: spec}
   end
 
+  describe "generate_paths/1" do
+    test "generates path instances" do
+      assert %{
+               paths: [
+                 %Swagdox.Path{path: "/users/{id}"},
+                 %Swagdox.Path{path: "/users"},
+                 %Swagdox.Path{path: "/orders/{id}"},
+                 %Swagdox.Path{path: "/orders"},
+                 %Swagdox.Path{path: "/orders"},
+                 %Swagdox.Path{path: "/orders/{id}"}
+               ]
+             } = Spec.generate_paths(spec())
+    end
+  end
+
+  describe "generate_schemas/1" do
+    test "generates schemas for all controllers" do
+      assert %{
+               schemas: [
+                 %Schema{
+                   module: Swagdox.User,
+                   type: "object",
+                   properties: [id: :binary_id, name: :string, email: :string],
+                   required: []
+                 },
+                 %Schema{
+                   module: Swagdox.Order,
+                   type: "object",
+                   properties: [id: :binary_id, item: :string, number: :integer],
+                   required: []
+                 }
+               ]
+             } = Spec.generate_schemas(spec())
+    end
+  end
+
   describe "render/1" do
     test "renders the info", %{spec: spec} do
       expected_info = %{
@@ -94,17 +129,29 @@ defmodule Swagdox.SpecTest do
       assert Spec.render(spec)["servers"] == expected_servers
     end
 
-    test "generate_paths/1" do
+    test "renders the schemas", %{spec: spec} do
       assert %{
-               paths: [
-                 %Swagdox.Path{path: "/users/{id}"},
-                 %Swagdox.Path{path: "/users"},
-                 %Swagdox.Path{path: "/orders/{id}"},
-                 %Swagdox.Path{path: "/orders"},
-                 %Swagdox.Path{path: "/orders"},
-                 %Swagdox.Path{path: "/orders/{id}"}
-               ]
-             } = Spec.generate_paths(spec())
+               "components" => %{
+                 "schemas" => %{
+                   "User" => %{
+                     "type" => "object",
+                     "properties" => %{
+                       "id" => %{"type" => "string"},
+                       "name" => %{"type" => "string"},
+                       "email" => %{"type" => "string"}
+                     }
+                   },
+                   "Order" => %{
+                     "type" => "object",
+                     "properties" => %{
+                       "id" => %{"type" => "string"},
+                       "item" => %{"type" => "string"},
+                       "number" => %{"type" => "integer"}
+                     }
+                   }
+                 }
+               }
+             } = spec |> Spec.generate_schemas() |> Spec.render()
     end
 
     test "renders the paths", %{spec: spec} do

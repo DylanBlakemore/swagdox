@@ -1,8 +1,8 @@
-defmodule Swagdox.PathDetectorTest do
+defmodule Swagdox.PathBuilderTest do
   use ExUnit.Case
 
   alias Swagdox.Path
-  alias Swagdox.PathDetector
+  alias Swagdox.PathBuilder
   alias SwagdoxWeb.OrderController
   alias SwagdoxWeb.Router, as: WebRouter
   alias SwagdoxWeb.UserController
@@ -26,11 +26,11 @@ defmodule Swagdox.PathDetectorTest do
 
   describe "build_paths/1" do
     test "when no routes are present on the module" do
-      assert PathDetector.build_paths(FakeRouter) == []
+      assert PathBuilder.build_paths(FakeRouter) == []
     end
 
     test "when errors occur" do
-      assert PathDetector.build_paths(BrokenRouter) == []
+      assert PathBuilder.build_paths(BrokenRouter) == []
     end
 
     test "when routes are present" do
@@ -65,7 +65,7 @@ defmodule Swagdox.PathDetectorTest do
                  verb: :delete,
                  controller: OrderController
                }
-             ] = PathDetector.build_paths(WebRouter)
+             ] = PathBuilder.build_paths(WebRouter)
     end
   end
 end

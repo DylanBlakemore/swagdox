@@ -10,6 +10,7 @@ defmodule Swagdox do
     config
     |> Spec.init()
     |> Spec.generate_paths()
+    |> Spec.generate_schemas()
     |> Spec.render()
   end
 
