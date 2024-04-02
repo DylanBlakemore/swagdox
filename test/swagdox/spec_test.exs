@@ -100,7 +100,7 @@ defmodule Swagdox.SpecTest do
                  %Schema{
                    module: Swagdox.Order,
                    type: "object",
-                   properties: [id: :binary_id, item: :string, number: :integer],
+                   properties: [item: :string, number: :integer],
                    required: []
                  }
                ]
@@ -144,7 +144,6 @@ defmodule Swagdox.SpecTest do
                    "Order" => %{
                      "type" => "object",
                      "properties" => %{
-                       "id" => %{"type" => "string"},
                        "item" => %{"type" => "string"},
                        "number" => %{"type" => "integer"}
                      }

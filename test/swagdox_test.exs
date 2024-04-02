@@ -8,7 +8,6 @@ defmodule SwagdoxTest do
       "schemas" => %{
         "Order" => %{
           "properties" => %{
-            "id" => %{"type" => "string"},
             "item" => %{"type" => "string"},
             "number" => %{"type" => "integer"}
           },

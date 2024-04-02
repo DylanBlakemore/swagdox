@@ -91,9 +91,55 @@ Response are described similarly, and must follow one of these formats:
 @response code, description
 ```
 
+#### Types
+
+For both parameters and responses, the type of the variable can be defined either as a
+standard type or as a schema. Basic types include:
+
+- `integer`
+- `number`
+- `string`
+- `boolean`
+- `array`
+- `object`
+
+Schemas (described below) are well-defined objects, identified by the fact that they always start with an upper-case letter.
+Arrays of types can be specified using the `[]` notation:
+
+```elixir
+@response 200, [User], ...
+```
+
 ### Schemas
 
-TODO
+Swagdox schemas can be defined on top of Ecto schemas by using the `Swagdox.Schema` module:
+
+```elixir
+defmodule Swagdox.Order do
+  use Ecto.Schema
+  use Swagdox.Schema, only: [:item, :number]
+
+  embedded_schema do
+    field :item, :string
+    field :number, :integer
+  end
+end
+```
+
+The `only` option here defines a whitelist of fields that are returned in the response.
+
+Schemas are added to the spec by using the `Swagbox.Controller` module:
+
+```elixir
+defmodule SwagdoxWeb.OrderController do
+  use Swagdox.Controller, schemas: [Swagdox.Order]
+
+  ...
+end
+```
+
+If a schema is included in any controller that has valid routes (i.e. is present in the Router),
+the schema will appear in the list of schemas in the output spec.
 
 ## Installation
 
