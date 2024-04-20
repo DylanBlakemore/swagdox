@@ -94,13 +94,13 @@ defmodule Swagdox.SpecTest do
                  %Schema{
                    module: Swagdox.User,
                    type: "object",
-                   properties: [id: :binary_id, name: :string, email: :string],
+                   properties: [{"id", "integer"}, {"name", "string"}, {"email", "string"}],
                    required: []
                  },
                  %Schema{
                    module: Swagdox.Order,
                    type: "object",
-                   properties: [item: :string, number: :integer],
+                   properties: [{"item", "string"}, {"number", "integer"}],
                    required: []
                  }
                ]
@@ -136,12 +136,12 @@ defmodule Swagdox.SpecTest do
                    "User" => %{
                      "type" => "object",
                      "properties" => %{
-                       "id" => %{"type" => "string"},
+                       "id" => %{"type" => "integer"},
                        "name" => %{"type" => "string"},
                        "email" => %{"type" => "string"}
                      }
                    },
-                   "Order" => %{
+                   "OrderName" => %{
                      "type" => "object",
                      "properties" => %{
                        "item" => %{"type" => "string"},

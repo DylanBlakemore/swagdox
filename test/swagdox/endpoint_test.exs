@@ -22,7 +22,7 @@ defmodule Swagdox.EndpointTest do
       assert docstring == """
              Creates a User.
 
-             API:
+             [Swagdox] API:
                @param user(body), object, "User attributes", required: true
 
                @response 201, User, "User created"
@@ -45,7 +45,7 @@ defmodule Swagdox.EndpointTest do
         docstring: """
         Creates a User.
 
-        API:
+        [Swagdox] API:
           @param user(body), object, "User attributes"
           @param id(path), integer, "User ID", required: true
 
@@ -71,7 +71,7 @@ defmodule Swagdox.EndpointTest do
         docstring: """
         Creates a User.
 
-        API:
+        [Swagdox] API:
           @param user(body), object, "User attributes"
           @param id(path), integer, "User ID", required: true
           @param invalid, map, "Invalid parameter"
@@ -92,7 +92,7 @@ defmodule Swagdox.EndpointTest do
         docstring: """
         Creates a User.
 
-        API:
+        [Swagdox] API:
           @param user(body), object, "User attributes"
           @param id(path), integer, "User ID", required: true
 

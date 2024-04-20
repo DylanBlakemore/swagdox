@@ -1,112 +1,48 @@
 defmodule Swagdox.SchemaTest do
   use ExUnit.Case
 
-  defmodule NoFieldsSchema do
-    use Ecto.Schema
-    use Swagdox.Schema
-
-    embedded_schema do
-      field :foo, :string
-      field :bar, :integer
-    end
-  end
-
-  defmodule WithFieldsSchema do
-    use Ecto.Schema
-    use Swagdox.Schema, only: [:foo]
-
-    embedded_schema do
-      field :foo, :string
-      field :bar, :integer
-    end
-  end
-
-  test "no fields" do
-    assert NoFieldsSchema.__swagdox_properties__() == nil
-  end
-
-  test "with fields" do
-    assert WithFieldsSchema.__swagdox_properties__() == [:foo]
-  end
-
-  test "compilation fails if the module is not an ecto schema" do
-    quoted =
-      quote do
-        defmodule NotAnEctoSchema do
-          use Swagdox.Schema
-        end
-      end
-
-    assert_raise CompileError, fn ->
-      Code.eval_quoted(quoted)
-    end
-  end
+  alias Swagdox.Order
 
   test "properties/1" do
-    assert Swagdox.Schema.properties(NoFieldsSchema) == [
-             {:id, :binary_id},
-             {:foo, :string},
-             {:bar, :integer}
-           ]
-
-    assert Swagdox.Schema.properties(WithFieldsSchema) == [
-             {:foo, :string}
-           ]
+    assert Swagdox.Schema.properties(Order) == [{"item", "string"}, {"number", "integer"}]
   end
 
   test "infer/1" do
-    assert Swagdox.Schema.infer(NoFieldsSchema) == %Swagdox.Schema{
+    assert Swagdox.Schema.infer(Order) == %Swagdox.Schema{
              type: "object",
-             module: NoFieldsSchema,
-             properties: [
-               {:id, :binary_id},
-               {:foo, :string},
-               {:bar, :integer}
-             ]
-           }
-
-    assert Swagdox.Schema.infer(WithFieldsSchema) == %Swagdox.Schema{
-             type: "object",
-             module: WithFieldsSchema,
-             properties: [
-               {:foo, :string}
-             ]
+             module: Order,
+             properties: [{"item", "string"}, {"number", "integer"}]
            }
   end
 
   test "name/1" do
-    assert Swagdox.Schema.name(%Swagdox.Schema{module: NoFieldsSchema}) == "NoFieldsSchema"
+    assert Swagdox.Schema.name(%Swagdox.Schema{module: Order}) == "OrderName"
   end
 
   describe "reference/1" do
     test "with a schema" do
-      assert Swagdox.Schema.reference(%Swagdox.Schema{module: NoFieldsSchema}) ==
-               "#/components/schemas/NoFieldsSchema"
+      assert Swagdox.Schema.reference(%Swagdox.Schema{module: Order}) ==
+               "#/components/schemas/OrderName"
     end
 
     test "with a string" do
-      assert Swagdox.Schema.reference("NoFieldsSchema") == "#/components/schemas/NoFieldsSchema"
+      assert Swagdox.Schema.reference("OrderName") == "#/components/schemas/OrderName"
     end
   end
 
   test "render/1" do
     schema = %Swagdox.Schema{
       type: "object",
-      module: NoFieldsSchema,
-      properties: [
-        {:id, :binary_id},
-        {:foo, :string},
-        {:bar, :integer}
-      ]
+      module: Order,
+      properties: [{"item", "string"}, {"number", "integer"}]
     }
 
     assert Swagdox.Schema.render(schema) == %{
-             "NoFieldsSchema" => %{
+             "OrderName" => %{
                "type" => "object",
                "properties" => %{
-                 "id" => %{"type" => "string"},
-                 "foo" => %{"type" => "string"},
-                 "bar" => %{"type" => "integer"}
+                 "item" => %{"type" => "string"},
+                 "number" => %{"type" => "integer"}
                }
              }
            }

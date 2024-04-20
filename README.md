@@ -54,7 +54,7 @@ defmodule MyApp.UserController do
   @doc """
   Returns a User.
 
-  API:
+  [Swagdox] API:
     @param id(query), integer, "User ID", required: true
 
     @response 200, User, "User found"
@@ -68,7 +68,7 @@ defmodule MyApp.UserController do
 end
 ```
 
-The above example shows how we can describe parameters and responses. The `API:` tag is what signals
+The above example shows how we can describe parameters and responses. The `[Swagdox] API:` tag is what signals
 a specification.
 
 #### Parameters

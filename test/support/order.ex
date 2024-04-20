@@ -1,6 +1,14 @@
 defmodule Swagdox.Order do
+  @moduledoc """
+  Represents an order.
+
+  [Swagdox] Schema:
+    @name OrderName
+
+    @property item, string, "Order item"
+    @property number, integer, "Order number"
+  """
   use Ecto.Schema
-  use Swagdox.Schema, only: [:item, :number]
 
   embedded_schema do
     field :item, :string

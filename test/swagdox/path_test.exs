@@ -12,7 +12,7 @@ defmodule Swagdox.PathTest do
     docstring: """
     Creates a User.
 
-    API:
+    [Swagdox] API:
       @param user(query), object, "User attributes"
 
       @response 201, User, "User created"
@@ -33,7 +33,7 @@ defmodule Swagdox.PathTest do
     docstring: """
     Returns a User.
 
-    API:
+    [Swagdox] API:
       @param id(path), integer, "User ID", required: true
 
       @response 200, User, "User found"

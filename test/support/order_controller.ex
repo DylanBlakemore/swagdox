@@ -4,7 +4,7 @@ defmodule SwagdoxWeb.OrderController do
   @doc """
   Returns an Order.
 
-  API:
+  [Swagdox] API:
     @param id(path), integer, "Order ID", required: true
 
     @response 200, Order, "Order found"
@@ -18,7 +18,7 @@ defmodule SwagdoxWeb.OrderController do
   @doc """
   Returns a list of Orders
 
-  API:
+  [Swagdox] API:
     @response 200, [Order], "Orders found"
     @response 403, "Orders not authorized"
   """
@@ -29,7 +29,7 @@ defmodule SwagdoxWeb.OrderController do
   @doc """
   Creates an Order.
 
-  API:
+  [Swagdox] API:
     @param order(body), object, "Order attributes", required: true
 
     @response 201, Order, "Order created"
@@ -42,7 +42,7 @@ defmodule SwagdoxWeb.OrderController do
   @doc """
   Deletes an Order.
 
-  API:
+  [Swagdox] API:
     @param id(path), integer, "Order ID", required: true
 
     @response 204, "Order deleted"

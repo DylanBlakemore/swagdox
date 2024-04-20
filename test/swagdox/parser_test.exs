@@ -3,11 +3,54 @@ defmodule Swagdox.ParserTest do
 
   alias Swagdox.Parser
 
+  describe "extract_name/1" do
+    test "extracts the name from a docstring" do
+      docstring = """
+      Creates a User.
+
+      [Swagdox] Schema:
+        @name User
+      """
+
+      assert Parser.extract_name(docstring) == "@name User"
+    end
+
+    test "errors with multiple names" do
+      docstring = """
+      Creates a User.
+
+      [Swagdox] Schema:
+        @name User
+        @name User
+      """
+
+      assert {:error, _reason} = Parser.extract_name(docstring)
+    end
+  end
+
+  test "extract_properties/1" do
+    docstring = """
+    Creates a User.
+
+    [Swagdox] Schema:
+      @property id, integer, "User id"
+      @property name, string, "User name"
+      @property email, string, "User email"
+    """
+
+    assert Parser.extract_properties(docstring) ==
+             [
+               "@property id, integer, \"User id\"",
+               "@property name, string, \"User name\"",
+               "@property email, string, \"User email\""
+             ]
+  end
+
   test "extract_description/1" do
     docstring = """
     Creates a User.
 
-    API:
+    [Swagdox] API:
       @param user, map, "User attributes"
 
       @response 201, User, "User created"
@@ -22,7 +65,7 @@ defmodule Swagdox.ParserTest do
       docstring = """
       Creates a User.
 
-      API:
+      [Swagdox] API:
         @param user, map, "User attributes"
         @param id, integer, "User ID"
 
@@ -39,7 +82,7 @@ defmodule Swagdox.ParserTest do
       docstring = """
       Creates a User.
 
-      API:
+      [Swagdox] API:
         @param user, map, "User attributes"
 
         @response 201, User, "User created"
@@ -54,7 +97,45 @@ defmodule Swagdox.ParserTest do
     end
   end
 
+  describe "extract_module_doc/1" do
+    test "extracts the module docstring from a module" do
+      module = Swagdox.User
+
+      assert Parser.extract_module_doc(module) ==
+               """
+               Represents a user.
+
+               [Swagdox] Schema:
+                 @name User
+
+                 @property id, integer, "User id"
+                 @property name, string, "User name"
+                 @property email, string, "User email"
+               """
+    end
+
+    test "returns an empty string if no docstring is found" do
+      module = Swagdox.Router
+
+      assert Parser.extract_module_doc(module) == ""
+    end
+  end
+
   describe "parse_definition/1" do
+    test "name" do
+      line = "@name User"
+
+      assert Parser.parse_definition(line) ==
+               {:name, "User"}
+    end
+
+    test "property" do
+      line = "@property id, integer, \"User id\""
+
+      assert Parser.parse_definition(line) ==
+               {:property, ["id", "integer", "User id"]}
+    end
+
     test "list types" do
       line = "@response 200, [User], \"List of users\""
 

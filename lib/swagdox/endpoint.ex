@@ -69,13 +69,13 @@ defmodule Swagdox.Endpoint do
   @doc """
   Extracts function docs that contain Open API specifications.
   A function doc is considered to contain an Open API specification if it contains
-  the string "API:", followed by one or more lines that start with @-variables.
+  the string "[Swagdox] API:", followed by one or more lines that start with @-variables.
 
   An example of a function doc that contains an Open API specification:
 
       Returns a User.
 
-      API:
+      [Swagdox] API:
         @param id, integer, required, "User ID"
 
         @response 200, User, "User found"
@@ -117,6 +117,6 @@ defmodule Swagdox.Endpoint do
   defp api_docs?({_function, doc_content}) do
     doc_content
     |> String.split("\n")
-    |> Enum.any?(fn line -> String.trim(line) == "API:" end)
+    |> Enum.any?(fn line -> String.trim(line) == "[Swagdox] API:" end)
   end
 end

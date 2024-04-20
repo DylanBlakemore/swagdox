@@ -7,7 +7,7 @@ defmodule SwagdoxWeb.UserController do
   @doc """
   Returns a User.
 
-  API:
+  [Swagdox] API:
     @param id(path), integer, "User ID", required: true
 
     @response 200, User, "User found"
@@ -28,7 +28,7 @@ defmodule SwagdoxWeb.UserController do
   @doc """
   Creates a User.
 
-  API:
+  [Swagdox] API:
     @param user(body), object, "User attributes", required: true
 
     @response 201, User, "User created"

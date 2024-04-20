@@ -16,6 +16,7 @@ defmodule Swagdox.MixProject do
         summary: [threshold: 95],
         ignore_modules: [
           Mix.Tasks.Swagdox.Generate,
+          Swagdox.Order,
           Swagdox.User,
           SwagdoxWeb.DefaultConfig,
           SwagdoxWeb.Router,

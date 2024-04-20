@@ -4,9 +4,21 @@ defmodule Swagdox.Parser do
   """
 
   @locations ["query", "header", "path", "cookie", "body"]
+  @local "en"
 
   defmodule ParserError do
     defexception message: "Parser error"
+  end
+
+  @doc """
+  Extracts the module docstring from a module.
+  """
+  @spec extract_module_doc(module()) :: String.t()
+  def extract_module_doc(module) do
+    case Code.fetch_docs(module) do
+      {_, _, _, _, %{@local => moduledoc}, _, _} -> moduledoc
+      _ -> ""
+    end
   end
 
   @doc """
@@ -20,9 +32,22 @@ defmodule Swagdox.Parser do
   @spec extract_description(String.t()) :: String.t()
   def extract_description(docstring) do
     docstring
-    |> String.split("API:\n")
+    |> String.split("[Swagdox] API:\n")
     |> Enum.at(0)
     |> String.trim()
+  end
+
+  @spec extract_name(String.t()) :: String.t()
+  def extract_name(docstring) do
+    case extract_elements(docstring, "@name") do
+      [name] -> name
+      _names -> raise ArgumentError, message: "Multiple names detected in docstring: #{docstring}"
+    end
+  end
+
+  @spec extract_properties(String.t()) :: list(String.t())
+  def extract_properties(docstring) do
+    extract_elements(docstring, "@property")
   end
 
   @spec extract_params(String.t()) :: list(String.t())
@@ -37,7 +62,7 @@ defmodule Swagdox.Parser do
 
   defp extract_elements(docstring, prefix) do
     docstring
-    |> String.split("API:\n")
+    |> String.split(~r/\[Swagdox\] \w+:\n/)
     |> Enum.at(1)
     |> String.split("\n")
     |> Enum.map(&String.trim/1)
@@ -80,6 +105,10 @@ defmodule Swagdox.Parser do
 
   defp check_shape({:response, [status | _rest]}) when not is_integer(status) do
     {:error, "Response status must be an integer"}
+  end
+
+  defp check_shape({:name, [name]}) do
+    {:name, name}
   end
 
   defp check_shape(definition), do: definition
