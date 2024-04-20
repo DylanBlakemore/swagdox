@@ -37,7 +37,7 @@ defmodule SwagdoxTest do
               "content" => %{
                 "application/json" => %{
                   "schema" => %{
-                    "items" => %{"$ref" => "#/components/schemas/Order"},
+                    "items" => %{"$ref" => "#/components/schemas/OrderName"},
                     "type" => "array"
                   }
                 }
@@ -54,7 +54,7 @@ defmodule SwagdoxTest do
           "responses" => %{
             "201" => %{
               "content" => %{
-                "application/json" => %{"schema" => %{"$ref" => "#/components/schemas/Order"}}
+                "application/json" => %{"schema" => %{"$ref" => "#/components/schemas/OrderName"}}
               },
               "description" => "Order created"
             },
@@ -96,7 +96,7 @@ defmodule SwagdoxTest do
           "responses" => %{
             "200" => %{
               "content" => %{
-                "application/json" => %{"schema" => %{"$ref" => "#/components/schemas/Order"}}
+                "application/json" => %{"schema" => %{"$ref" => "#/components/schemas/OrderName"}}
               },
               "description" => "Order found"
             },

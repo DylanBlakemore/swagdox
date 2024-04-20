@@ -24,7 +24,9 @@ defmodule Swagdox.ParserTest do
         @name User
       """
 
-      assert {:error, _reason} = Parser.extract_name(docstring)
+      assert_raise ArgumentError, fn ->
+        Parser.extract_name(docstring)
+      end
     end
   end
 
