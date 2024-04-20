@@ -112,21 +112,22 @@ Arrays of types can be specified using the `[]` notation:
 
 ### Schemas
 
-Swagdox schemas can be defined on top of Ecto schemas by using the `Swagdox.Schema` module:
+Swagdox schemas can be defined by adding a schema definition to the moduledocs.
+The definition must include a name, and can include one or more properties which
+should have the name, type, and optional description.
 
 ```elixir
 defmodule Swagdox.Order do
-  use Ecto.Schema
-  use Swagdox.Schema, only: [:item, :number]
+  @mouledoc """
+  Some description
 
-  embedded_schema do
-    field :item, :string
-    field :number, :integer
-  end
+  [Swagdox] Schema:
+    @name Order
+    @property item, string, "The item name"
+    @property number, integer, "The number of items ordered"
+  """
 end
 ```
-
-The `only` option here defines a whitelist of fields that are returned in the response.
 
 Schemas are added to the spec by using the `Swagbox.Controller` module:
 
