@@ -2,13 +2,15 @@ defmodule Swagdox.SchemaTest do
   use ExUnit.Case
 
   alias Swagdox.Order
+  alias Swagdox.Schema
+  alias Swagdox.User
 
   test "properties/1" do
-    assert Swagdox.Schema.properties(Order) == [{"item", "string"}, {"number", "integer"}]
+    assert Schema.properties(Order) == [{"item", "string"}, {"number", "integer"}]
   end
 
   test "infer/1" do
-    assert Swagdox.Schema.infer(Order) == %Swagdox.Schema{
+    assert Schema.infer(Order) == %Schema{
              type: "object",
              module: Order,
              properties: [{"item", "string"}, {"number", "integer"}]
@@ -16,34 +18,53 @@ defmodule Swagdox.SchemaTest do
   end
 
   test "name/1" do
-    assert Swagdox.Schema.name(%Swagdox.Schema{module: Order}) == "OrderName"
+    assert Schema.name(%Schema{module: Order}) == "OrderName"
   end
 
   describe "reference/1" do
     test "with a schema" do
-      assert Swagdox.Schema.reference(%Swagdox.Schema{module: Order}) ==
+      assert Schema.reference(%Schema{module: Order}) ==
                "#/components/schemas/OrderName"
     end
 
     test "with a string" do
-      assert Swagdox.Schema.reference("OrderName") == "#/components/schemas/OrderName"
+      assert Schema.reference("OrderName") == "#/components/schemas/OrderName"
     end
   end
 
   test "render/1" do
-    schema = %Swagdox.Schema{
+    schema = %Schema{
       type: "object",
       module: Order,
       properties: [{"item", "string"}, {"number", "integer"}]
     }
 
-    assert Swagdox.Schema.render(schema) == %{
+    assert Schema.render(schema) == %{
              "OrderName" => %{
                "type" => "object",
                "properties" => %{
                  "item" => %{"type" => "string"},
                  "number" => %{"type" => "integer"}
                }
+             }
+           }
+  end
+
+  test "render/1 with arrays" do
+    schema = Schema.infer(User)
+
+    assert Schema.render(schema) == %{
+             "User" => %{
+               "properties" => %{
+                 "email" => %{"type" => "string"},
+                 "id" => %{"type" => "integer"},
+                 "name" => %{"type" => "string"},
+                 "orders" => %{
+                   "type" => "array",
+                   "items" => %{"$ref" => "#/components/schemas/OrderName"}
+                 }
+               },
+               "type" => "object"
              }
            }
   end

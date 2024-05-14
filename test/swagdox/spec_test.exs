@@ -105,7 +105,12 @@ defmodule Swagdox.SpecTest do
                  %Schema{
                    module: Swagdox.User,
                    type: "object",
-                   properties: [{"id", "integer"}, {"name", "string"}, {"email", "string"}],
+                   properties: [
+                     {"id", "integer"},
+                     {"name", "string"},
+                     {"email", "string"},
+                     {"orders", ["OrderName"]}
+                   ],
                    required: []
                  },
                  %Schema{

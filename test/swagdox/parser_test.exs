@@ -113,6 +113,7 @@ defmodule Swagdox.ParserTest do
                  @property id, integer, "User id"
                  @property name, string, "User name"
                  @property email, string, "User email"
+                 @property orders, [OrderName], "User orders"
                """
     end
 
@@ -136,6 +137,13 @@ defmodule Swagdox.ParserTest do
 
       assert Parser.parse_definition(line) ==
                {:property, ["id", "integer", "User id"]}
+    end
+
+    test "array properties" do
+      line = "@property user, [User], \"User object\""
+
+      assert Parser.parse_definition(line) ==
+               {:property, ["user", ["User"], "User object"]}
     end
 
     test "list types" do

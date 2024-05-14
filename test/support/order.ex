@@ -13,5 +13,6 @@ defmodule Swagdox.Order do
   embedded_schema do
     field :item, :string
     field :number, :integer
+    field :user_id, :integer
   end
 end

@@ -17,16 +17,20 @@ defmodule SwagdoxTest do
   @specification %{
     "components" => %{
       "schemas" => %{
+        "OrderName" => %{
+          "properties" => %{"item" => %{"type" => "string"}, "number" => %{"type" => "integer"}},
+          "type" => "object"
+        },
         "User" => %{
           "properties" => %{
             "email" => %{"type" => "string"},
             "id" => %{"type" => "integer"},
-            "name" => %{"type" => "string"}
+            "name" => %{"type" => "string"},
+            "orders" => %{
+              "items" => %{"$ref" => "#/components/schemas/OrderName"},
+              "type" => "array"
+            }
           },
-          "type" => "object"
-        },
-        "OrderName" => %{
-          "properties" => %{"item" => %{"type" => "string"}, "number" => %{"type" => "integer"}},
           "type" => "object"
         }
       }

@@ -3,6 +3,7 @@ defmodule Swagdox.Schema do
   This module provides a way to extract the fields and types of an Ecto.Schema.
   """
   alias Swagdox.Parser
+  alias Swagdox.Type
 
   defstruct [:module, :type, properties: %{}, required: []]
 
@@ -75,9 +76,7 @@ defmodule Swagdox.Schema do
 
   defp render_properties(properties) do
     Enum.into(properties, %{}, fn {key, value} ->
-      {to_string(key), %{"type" => type(value)}}
+      {to_string(key), Type.render(value)}
     end)
   end
-
-  defp type(type), do: to_string(type)
 end
