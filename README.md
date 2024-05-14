@@ -135,18 +135,7 @@ defmodule Swagdox.Order do
 end
 ```
 
-Schemas are added to the spec by using the `Swagbox.Controller` module:
-
-```elixir
-defmodule SwagdoxWeb.OrderController do
-  use Swagdox.Controller, schemas: [Swagdox.Order]
-
-  ...
-end
-```
-
-If a schema is included in any controller that has valid routes (i.e. is present in the Router),
-the schema will appear in the list of schemas in the output spec.
+Schemas are detected automatically based on the `[Swagdox] Schema:` tag.
 
 ## Installation
 
