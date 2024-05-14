@@ -41,6 +41,7 @@ defmodule Swagdox.Parser do
   def extract_name(docstring) do
     case extract_elements(docstring, "@name") do
       [name] -> name
+      [] -> raise ArgumentError, message: "No name detected in docstring: #{docstring}"
       _names -> raise ArgumentError, message: "Multiple names detected in docstring: #{docstring}"
     end
   end

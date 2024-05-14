@@ -7,7 +7,8 @@ defmodule Swagdox.Type do
     "integer",
     "number",
     "string",
-    "boolean"
+    "boolean",
+    "object"
   ]
 
   @type variable :: String.t() | [String.t()] | atom() | [atom()]

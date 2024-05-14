@@ -15,6 +15,18 @@ defmodule Swagdox.ParserTest do
       assert Parser.extract_name(docstring) == "@name User"
     end
 
+    test "errors with no name" do
+      docstring = """
+      Creates a User.
+
+      [Swagdox] Schema:
+      """
+
+      assert_raise ArgumentError, fn ->
+        Parser.extract_name(docstring)
+      end
+    end
+
     test "errors with multiple names" do
       docstring = """
       Creates a User.
