@@ -8,8 +8,19 @@ defmodule Swagdox.SpecTest do
   alias Swagdox.Schema
   alias Swagdox.Spec
 
+  @config %Config{
+    version: "0.1",
+    title: "Swagdox",
+    description: "A library for generating OpenAPI documentation from Elixir code.",
+    servers: ["http://localhost:4000"],
+    router: SwagdoxWeb.Router,
+    openapi_version: "3.0.0",
+    output: "swagger.json",
+    format: "json"
+  }
+
   # credo:disable-for-next-line
-  def spec, do: Spec.init(Config.init())
+  def spec, do: Spec.init(@config)
 
   test "init/0" do
     assert %Spec{

@@ -25,15 +25,21 @@ All options can alternatively be specified using standard shorthand syntax (`-o`
 
 ## Configuration
 
-Swagdox configuration can be set in the Application config, using the following configuration options:
+Swagdox configuration can be set in the project setup in `mix.exs`, using the following configuration options:
 
 ```elixir
-config :swagdox,
-  version: "1.0", # The API version. Optional
-  title: "My App", # The title for the specification. Required
-  description: "A longer description", # Detailed description of the API. Optional
-  servers: ["localhost://4001", "my-app.my-domain.com"], # List of servers on which the app runs. Optional
-  router: MyAppWeb.Router, # Main router module for the application. This module should export the `__routes__/0` function. Required
+def project do
+  [
+    swagdox: [
+      router: MyAppWeb.Router,
+      format: "yaml",
+      output: "./openapi.yml",
+      title: "My App",
+      version: "1.0",
+      description: "A longer description"
+    ]
+  ]
+end
 ```
 
 Alternatively, any and all of these options can be set via command line arguments:

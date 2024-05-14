@@ -52,27 +52,18 @@ defmodule Mix.Tasks.Swagdox.Generate do
         ]
       )
 
-    if is_nil(parsed[:output]) do
-      raise """
-      Missing required argument: --output
-      """
-    end
-
-    output = parsed[:output]
-    format = parsed[:format] || "json"
-
     config = config(parsed)
 
-    case format do
+    case config.format do
       "json" ->
-        Swagdox.write_json(config, output)
+        Swagdox.write_json(config, config.output)
 
       "yaml" ->
-        Swagdox.write_yaml(config, output)
+        Swagdox.write_yaml(config, config.output)
 
       _ ->
         raise """
-        Invalid format: #{format}
+        Invalid format: #{config.format}
         """
     end
   end
@@ -83,28 +74,21 @@ defmodule Mix.Tasks.Swagdox.Generate do
     description = description(args[:description])
     servers = servers(args[:servers])
     router = router(args[:router])
-
-    check_missing_config(:title, title)
-    check_missing_config(:router, router)
+    output = output(args[:output])
+    format = format(args[:format])
 
     Swagdox.Config.new(
       title: title,
       version: version,
       description: description,
       servers: servers,
-      router: router
+      router: router,
+      output: output,
+      format: format
     )
   end
 
-  defp check_missing_config(key, value) do
-    if is_nil(value) do
-      raise """
-      Missing required configuration: #{key}
-      """
-    end
-  end
-
-  defp router(nil), do: Application.get_env(:swagdox, :router)
+  defp router(nil), do: project_config(:router)
 
   defp router(router) do
     String.to_existing_atom("Elixir.#{router}")
@@ -118,15 +102,29 @@ defmodule Mix.Tasks.Swagdox.Generate do
       )
   end
 
-  defp servers(nil), do: Application.get_env(:swagdox, :servers, [])
+  defp servers(nil), do: project_config(:servers, [])
   defp servers(servers), do: String.split(servers, ",")
 
-  defp title(nil), do: Application.get_env(:swagdox, :title)
+  defp title(nil), do: project_config(:title)
   defp title(title), do: title
 
-  defp version(nil), do: Application.get_env(:swagdox, :version, "0.1.0")
+  defp version(nil), do: project_config(:version, "0.1.0")
   defp version(version), do: version
 
-  defp description(nil), do: Application.get_env(:swagdox, :description, "")
+  defp description(nil), do: project_config(:description, "")
   defp description(description), do: description
+
+  defp output(nil), do: project_config(:output)
+  defp output(output), do: output
+
+  defp format(nil), do: project_config(:format, "json")
+  defp format(format), do: format
+
+  defp project_config(opt, default) do
+    Mix.Project.config()[:swagdox][opt] || default
+  end
+
+  defp project_config(opt) do
+    Mix.Project.config()[:swagdox][opt] || raise("Missing required configuration: #{opt}")
+  end
 end
