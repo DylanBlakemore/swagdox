@@ -103,6 +103,12 @@ defmodule Swagdox.SpecTest do
       assert %{
                schemas: [
                  %Schema{
+                   module: Swagdox.Order,
+                   type: "object",
+                   properties: [{"item", "string"}, {"number", "integer"}],
+                   required: []
+                 },
+                 %Schema{
                    module: Swagdox.User,
                    type: "object",
                    properties: [
@@ -111,12 +117,6 @@ defmodule Swagdox.SpecTest do
                      {"email", "string"},
                      {"orders", ["OrderName"]}
                    ],
-                   required: []
-                 },
-                 %Schema{
-                   module: Swagdox.Order,
-                   type: "object",
-                   properties: [{"item", "string"}, {"number", "integer"}],
                    required: []
                  }
                ]

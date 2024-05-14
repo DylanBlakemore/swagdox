@@ -65,8 +65,7 @@ defmodule Swagdox.Spec do
   """
   @spec generate_schemas(t()) :: t()
   def generate_schemas(spec) do
-    router = spec.config.router
-    schemas = SchemaBuilder.build_schemas(router)
+    schemas = SchemaBuilder.build_schemas()
 
     %__MODULE__{spec | schemas: schemas}
   end

@@ -10,10 +10,6 @@ defmodule Swagdox.ControllerTest do
       token: "X-HEADER-TOKEN"
   end
 
-  test "controller schemas" do
-    assert TestController.__schemas__() == [Swagdox.User, Swagdox.Post]
-  end
-
   test "controller security" do
     assert TestController.__security__() == %{type: :header, token: "X-HEADER-TOKEN"}
   end

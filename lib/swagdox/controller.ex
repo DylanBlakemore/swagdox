@@ -7,11 +7,6 @@ defmodule Swagdox.Controller do
   @spec __using__(keyword()) :: Macro.t()
   defmacro __using__(opts) do
     quote bind_quoted: [opts: opts] do
-      @spec __schemas__() :: list()
-      def __schemas__ do
-        unquote(opts)[:schemas]
-      end
-
       @spec __security__() :: map()
       def __security__ do
         %{

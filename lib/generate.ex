@@ -30,6 +30,8 @@ defmodule Mix.Tasks.Swagdox.Generate do
   @impl Mix.Task
   @spec run(list(String.t())) :: :ok
   def run(args) do
+    Mix.Task.run("app.start")
+
     {parsed, _, _} =
       OptionParser.parse(args,
         aliases: [
