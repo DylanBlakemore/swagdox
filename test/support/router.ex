@@ -1,4 +1,7 @@
 defmodule SwagdoxWeb.Router do
+  @moduledoc """
+  Routes for our SwagdoxWeb application.
+  """
   @type route :: %{
           path: String.t(),
           metadata: map(),

@@ -32,7 +32,7 @@ defmodule Swagdox.Parser do
   @spec extract_description(String.t()) :: String.t()
   def extract_description(docstring) do
     docstring
-    |> String.split("[Swagdox] API:\n")
+    |> String.split("[Swagdox]")
     |> Enum.at(0)
     |> String.trim()
   end

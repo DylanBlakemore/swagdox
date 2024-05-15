@@ -117,7 +117,7 @@ defmodule Swagdox.ParserTest do
 
       assert Parser.extract_module_doc(module) ==
                """
-               Represents a user.
+               A user of the application
 
                [Swagdox] Schema:
                  @name User

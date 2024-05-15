@@ -18,10 +18,12 @@ defmodule SwagdoxTest do
     "components" => %{
       "schemas" => %{
         "OrderName" => %{
+          "description" => "An order placed by a customer",
           "properties" => %{"item" => %{"type" => "string"}, "number" => %{"type" => "integer"}},
           "type" => "object"
         },
         "User" => %{
+          "description" => "A user of the application",
           "properties" => %{
             "email" => %{"type" => "string"},
             "id" => %{"type" => "integer"},

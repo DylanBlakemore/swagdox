@@ -9,11 +9,16 @@ defmodule Swagdox.SchemaTest do
     assert Schema.properties(Order) == [{"item", "string"}, {"number", "integer"}]
   end
 
+  test "description/1" do
+    assert Schema.description(Order) == "An order placed by a customer"
+  end
+
   test "infer/1" do
     assert Schema.infer(Order) == %Schema{
              type: "object",
              module: Order,
-             properties: [{"item", "string"}, {"number", "integer"}]
+             properties: [{"item", "string"}, {"number", "integer"}],
+             description: "An order placed by a customer"
            }
   end
 
@@ -41,6 +46,7 @@ defmodule Swagdox.SchemaTest do
 
     assert Schema.render(schema) == %{
              "OrderName" => %{
+               "description" => nil,
                "type" => "object",
                "properties" => %{
                  "item" => %{"type" => "string"},
@@ -55,6 +61,7 @@ defmodule Swagdox.SchemaTest do
 
     assert Schema.render(schema) == %{
              "User" => %{
+               "description" => "A user of the application",
                "properties" => %{
                  "email" => %{"type" => "string"},
                  "id" => %{"type" => "integer"},

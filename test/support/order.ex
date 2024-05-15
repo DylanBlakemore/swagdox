@@ -1,6 +1,6 @@
 defmodule Swagdox.Order do
   @moduledoc """
-  Represents an order.
+  An order placed by a customer
 
   [Swagdox] Schema:
     @name OrderName

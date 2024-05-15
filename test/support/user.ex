@@ -1,6 +1,6 @@
 defmodule Swagdox.User do
   @moduledoc """
-  Represents a user.
+  A user of the application
 
   [Swagdox] Schema:
     @name User

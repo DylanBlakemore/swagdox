@@ -5,14 +5,15 @@ defmodule Swagdox.Schema do
   alias Swagdox.Parser
   alias Swagdox.Type
 
-  defstruct [:module, :type, properties: %{}, required: []]
+  defstruct [:module, :description, :type, properties: %{}, required: []]
 
   @type property :: {atom(), atom()}
   @type t :: %__MODULE__{
           type: String.t(),
           module: module(),
           properties: list(property()),
-          required: list(atom())
+          required: list(atom()),
+          description: String.t()
         }
 
   @spec infer(module()) :: t()
@@ -20,8 +21,16 @@ defmodule Swagdox.Schema do
     %__MODULE__{
       module: module,
       type: "object",
-      properties: properties(module)
+      properties: properties(module),
+      description: description(module)
     }
+  end
+
+  @spec description(module()) :: String.t()
+  def description(schema) do
+    schema
+    |> Parser.extract_module_doc()
+    |> Parser.extract_description()
   end
 
   @spec properties(module()) :: list(property())
@@ -68,6 +77,7 @@ defmodule Swagdox.Schema do
 
     %{
       name => %{
+        "description" => schema.description,
         "type" => schema.type,
         "properties" => render_properties(schema.properties)
       }
