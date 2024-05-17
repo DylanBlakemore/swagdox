@@ -1,11 +1,13 @@
 defmodule Swagdox.SpecTest do
   use ExUnit.Case
 
+  alias Swagdox.Authorization
   alias Swagdox.Config
   alias Swagdox.Parameter
   alias Swagdox.Path
   alias Swagdox.Response
   alias Swagdox.Schema
+  alias Swagdox.Security
   alias Swagdox.Spec
 
   @config %Config{
@@ -44,7 +46,10 @@ defmodule Swagdox.SpecTest do
         verb: "get",
         path: "/users",
         description: "Returns a list of users.",
-        responses: [Response.build(200, ["User"], "List of users")]
+        responses: [Response.build(200, ["User"], "List of users")],
+        security: [
+          %Security{name: "BasicAuth", scopes: []}
+        ]
       },
       %Path{
         verb: "post",
@@ -124,6 +129,27 @@ defmodule Swagdox.SpecTest do
     end
   end
 
+  describe "generate_security_schemes/1" do
+    test "generates security schemes for the router" do
+      assert %{
+               security: [
+                 %Authorization{
+                   type: "http",
+                   name: "BasicAuth",
+                   description: "Basic http authentication",
+                   properties: %{"scheme" => "basic"}
+                 },
+                 %Authorization{
+                   type: "apiKey",
+                   name: "ApiKey",
+                   description: "API key authentication",
+                   properties: %{"in" => "header", "name" => "X-API-Key"}
+                 }
+               ]
+             } = Spec.generate_security_schemes(spec())
+    end
+  end
+
   describe "render/1" do
     test "renders the info", %{spec: spec} do
       expected_info = %{
@@ -143,6 +169,26 @@ defmodule Swagdox.SpecTest do
       ]
 
       assert Spec.render(spec)["servers"] == expected_servers
+    end
+
+    test "renders the security schemes", %{spec: spec} do
+      assert %{
+               "components" => %{
+                 "securitySchemes" => %{
+                   "ApiKey" => %{
+                     "description" => "API key authentication",
+                     "in" => "header",
+                     "name" => "X-API-Key",
+                     "type" => "apiKey"
+                   },
+                   "BasicAuth" => %{
+                     "description" => "Basic http authentication",
+                     "scheme" => "basic",
+                     "type" => "http"
+                   }
+                 }
+               }
+             } = spec |> Spec.generate_security_schemes() |> Spec.render()
     end
 
     test "renders the schemas", %{spec: spec} do
@@ -174,6 +220,7 @@ defmodule Swagdox.SpecTest do
                "/users" => %{
                  "get" => %{
                    "description" => "Returns a list of users.",
+                   "security" => [%{"BasicAuth" => []}],
                    "responses" => %{
                      "200" => %{
                        "content" => %{
@@ -190,6 +237,7 @@ defmodule Swagdox.SpecTest do
                  },
                  "post" => %{
                    "description" => "Creates a User.",
+                   "security" => [],
                    "responses" => %{
                      "201" => %{
                        "content" => %{
@@ -206,6 +254,7 @@ defmodule Swagdox.SpecTest do
                "/users/{id}" => %{
                  "get" => %{
                    "description" => "Returns a User.",
+                   "security" => [],
                    "parameters" => [
                      %{
                        "description" => "User ID",
@@ -222,6 +271,7 @@ defmodule Swagdox.SpecTest do
                },
                "/orders" => %{
                  "get" => %{
+                   "security" => [],
                    "description" => "Returns a list of orders.",
                    "responses" => %{}
                  }

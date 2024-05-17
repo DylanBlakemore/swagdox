@@ -6,6 +6,7 @@ defmodule Swagdox.Endpoint do
   alias Swagdox.Parameter
   alias Swagdox.Parser
   alias Swagdox.Response
+  alias Swagdox.Security
 
   defstruct [:module, :function, :docstring]
 
@@ -64,6 +65,25 @@ defmodule Swagdox.Endpoint do
 
   defp build_response({:response, [status, description]}) do
     Response.build(status, description)
+  end
+
+  @doc """
+  Returns the authorization options for the endpoint.
+  """
+  @spec security(t()) :: list(String.t())
+  def security(endpoint) do
+    endpoint.docstring
+    |> Parser.extract_security()
+    |> Enum.map(&Parser.parse_definition/1)
+    |> Enum.map(&build_authorization/1)
+  end
+
+  defp build_authorization({:security, [value]}) do
+    Security.build(value)
+  end
+
+  defp build_authorization({:security, [value, scopes]}) do
+    Security.build(value, scopes)
   end
 
   @doc """

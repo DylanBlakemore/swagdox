@@ -10,6 +10,8 @@ defmodule SwagdoxWeb.OrderController do
     @response 200, OrderName, "Order found"
     @response 403, "Order not authorized"
     @response 404, "Order not found"
+
+    @security ApiKey, [read]
   """
   @spec show(any(), map()) :: nil
   def show(_conn, _params) do
@@ -21,6 +23,8 @@ defmodule SwagdoxWeb.OrderController do
   [Swagdox] API:
     @response 200, [OrderName], "Orders found"
     @response 403, "Orders not authorized"
+
+    @security ApiKey, [read]
   """
   @spec index(any(), map()) :: nil
   def index(_conn, _params) do
@@ -34,6 +38,8 @@ defmodule SwagdoxWeb.OrderController do
 
     @response 201, OrderName, "Order created"
     @response 400, "Invalid order attributes"
+
+    @security ApiKey, [write]
   """
   @spec create(any(), map()) :: nil
   def create(_conn, _params) do
@@ -48,6 +54,8 @@ defmodule SwagdoxWeb.OrderController do
     @response 204, "Order deleted"
     @response 403, "Order not authorized"
     @response 404, "Order not found"
+
+    @security ApiKey, [write]
   """
   @spec delete(any(), map()) :: nil
   def delete(_conn, _params) do

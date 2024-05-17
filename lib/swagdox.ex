@@ -11,6 +11,7 @@ defmodule Swagdox do
     |> Spec.init()
     |> Spec.generate_paths()
     |> Spec.generate_schemas()
+    |> Spec.generate_security_schemes()
     |> Spec.render()
   end
 

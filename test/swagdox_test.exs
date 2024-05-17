@@ -35,6 +35,19 @@ defmodule SwagdoxTest do
           },
           "type" => "object"
         }
+      },
+      "securitySchemes" => %{
+        "ApiKey" => %{
+          "description" => "API key authentication",
+          "in" => "header",
+          "name" => "X-API-Key",
+          "type" => "apiKey"
+        },
+        "BasicAuth" => %{
+          "description" => "Basic http authentication",
+          "scheme" => "basic",
+          "type" => "http"
+        }
       }
     },
     "info" => %{
@@ -62,7 +75,8 @@ defmodule SwagdoxTest do
               "description" => "Orders found"
             },
             "403" => %{"description" => "Orders not authorized"}
-          }
+          },
+          "security" => [%{"ApiKey" => ["read"]}]
         },
         "post" => %{
           "description" => "Creates an Order.",
@@ -76,7 +90,8 @@ defmodule SwagdoxTest do
               "description" => "Order created"
             },
             "400" => %{"description" => "Invalid order attributes"}
-          }
+          },
+          "security" => [%{"ApiKey" => ["write"]}]
         }
       },
       "/orders/{id}" => %{
@@ -96,7 +111,8 @@ defmodule SwagdoxTest do
             "204" => %{"description" => "Order deleted"},
             "403" => %{"description" => "Order not authorized"},
             "404" => %{"description" => "Order not found"}
-          }
+          },
+          "security" => [%{"ApiKey" => ["write"]}]
         },
         "get" => %{
           "description" => "Returns an Order.",
@@ -119,7 +135,8 @@ defmodule SwagdoxTest do
             },
             "403" => %{"description" => "Order not authorized"},
             "404" => %{"description" => "Order not found"}
-          }
+          },
+          "security" => [%{"ApiKey" => ["read"]}]
         }
       },
       "/users" => %{
@@ -135,7 +152,8 @@ defmodule SwagdoxTest do
               "description" => "User created"
             },
             "400" => %{"description" => "Invalid user attributes"}
-          }
+          },
+          "security" => [%{"BasicAuth" => ["admin"]}]
         }
       },
       "/users/{id}" => %{
@@ -160,7 +178,8 @@ defmodule SwagdoxTest do
             },
             "403" => %{"description" => "User not authorized"},
             "404" => %{"description" => "User not found"}
-          }
+          },
+          "security" => [%{"BasicAuth" => ["read"]}]
         }
       }
     },

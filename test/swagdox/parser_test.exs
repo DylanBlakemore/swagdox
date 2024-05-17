@@ -111,6 +111,37 @@ defmodule Swagdox.ParserTest do
     end
   end
 
+  describe "extract_authorizations/1" do
+    test "extracts security schemes from a docstring" do
+      docstring = """
+      Creates a User.
+
+      [Swagdox] Router:
+        @authorization BasicAuth, basic, "Basic http authentication"
+        @authorization ApiKey, header("X-API-KEY"), "API key authentication"
+      """
+
+      assert Parser.extract_authorizations(docstring) ==
+               [
+                 "@authorization BasicAuth, basic, \"Basic http authentication\"",
+                 "@authorization ApiKey, header(\"X-API-KEY\"), \"API key authentication\""
+               ]
+    end
+  end
+
+  describe "extract_security/1" do
+    test "extracts endpoint authorization from a docstring" do
+      docstring = """
+      Creates a User.
+
+      [Swagdox] API:
+        @security BasicAuth
+      """
+
+      assert Parser.extract_security(docstring) == ["@security BasicAuth"]
+    end
+  end
+
   describe "extract_module_doc/1" do
     test "extracts the module docstring from a module" do
       module = Swagdox.User
@@ -137,6 +168,18 @@ defmodule Swagdox.ParserTest do
   end
 
   describe "parse_definition/1" do
+    test "security scheme" do
+      line = "@authorization BasicAuth, basic, \"Basic http authentication\""
+
+      assert Parser.parse_definition(line) ==
+               {:authorization, ["BasicAuth", "basic", "Basic http authentication"]}
+
+      line = "@authorization ApiKey, header(\"X-API-KEY\"), \"API key authentication\""
+
+      assert Parser.parse_definition(line) ==
+               {:authorization, ["ApiKey", {"header", "X-API-KEY"}, "API key authentication"]}
+    end
+
     test "name" do
       line = "@name User"
 

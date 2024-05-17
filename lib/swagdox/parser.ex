@@ -10,6 +10,8 @@ defmodule Swagdox.Parser do
     defexception message: "Parser error"
   end
 
+  defguardp is_primitive(value) when is_binary(value) or is_boolean(value) or is_number(value)
+
   @doc """
   Extracts the module docstring from a module.
   """
@@ -46,6 +48,11 @@ defmodule Swagdox.Parser do
     end
   end
 
+  @spec extract_authorizations(String.t()) :: list(String.t())
+  def extract_authorizations(docstring) do
+    extract_elements(docstring, "@authorization")
+  end
+
   @spec extract_properties(String.t()) :: list(String.t())
   def extract_properties(docstring) do
     extract_elements(docstring, "@property")
@@ -59,6 +66,11 @@ defmodule Swagdox.Parser do
   @spec extract_responses(String.t()) :: list(String.t())
   def extract_responses(docstring) do
     extract_elements(docstring, "@response")
+  end
+
+  @spec extract_security(String.t()) :: list(String.t())
+  def extract_security(docstring) do
+    extract_elements(docstring, "@security")
   end
 
   defp extract_elements(docstring, prefix) do
@@ -141,8 +153,12 @@ defmodule Swagdox.Parser do
     {name, parse_node(value)}
   end
 
-  defp parse_node(value) when is_binary(value) or is_boolean(value) or is_number(value) do
+  defp parse_node(value) when is_primitive(value) do
     value
+  end
+
+  defp parse_node({name, _meta, [value]}) when is_atom(name) and is_primitive(value) do
+    {to_string(name), parse_node(value)}
   end
 
   defp parse_node(node) when is_list(node) do

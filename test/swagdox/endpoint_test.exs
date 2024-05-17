@@ -4,6 +4,7 @@ defmodule Swagdox.EndpointTest do
   alias Swagdox.Endpoint
   alias Swagdox.Parameter
   alias Swagdox.Response
+  alias Swagdox.Security
   alias SwagdoxWeb.UserController
 
   describe "extract_all/1" do
@@ -27,6 +28,8 @@ defmodule Swagdox.EndpointTest do
 
                @response 201, User, "User created"
                @response 400, "Invalid user attributes"
+
+               @security BasicAuth, [admin]
              """
     end
 
@@ -114,6 +117,40 @@ defmodule Swagdox.EndpointTest do
                  description: "Invalid user attributes"
                }
              ] = responses
+    end
+  end
+
+  describe "security/1" do
+    test "returns the authorization for the endpoint" do
+      endpoint = %Endpoint{
+        module: UserController,
+        function: :create,
+        docstring: """
+        Creates a User.
+
+        [Swagdox] API:
+          @param user(body), object, "User attributes"
+          @param id(path), integer, "User ID", required: true
+
+          @response 201, User, "User created", content_type: "application/json"
+          @response 400, "Invalid user attributes"
+
+          @security BasicAuth
+          @security BearerAuth, [admin, write]
+        """
+      }
+
+      security = Endpoint.security(endpoint)
+
+      assert [
+               %Security{
+                 name: "BasicAuth"
+               },
+               %Security{
+                 name: "BearerAuth",
+                 scopes: ["admin", "write"]
+               }
+             ] = security
     end
   end
 end

@@ -50,6 +50,28 @@ mix swagdox.generate -o ./openapi.yml -f yaml -v 1.0 -t "My App" -d "A longer de
 
 ## Specification
 
+### Router
+
+Authorization schemes are described in the moduledoc of the top-level router for the project as follows:
+
+```elixir
+defmodule MyAppWeb.Router do
+  @moduledoc """
+  The router for my app.
+
+  [Swagdox] Router:
+    @authorization ApiAuth, header("X-API-Key"), "Header-based API authorization"
+    @authorization BearerAuth, bearer, "Bearer auth"
+  """
+end
+```
+
+The format of the specification is `@authorization Name, type(opts), "Description"`. The name can be anything - it is used later as a reference
+in paths. The currently supported types are:
+
+- `header, cookie, body, query`: used for API authentication. Requires an opt which describes the key of the token
+- `basic, bearer`: describe basic http authentication
+
 ### API
 
 Specifying the API for a controller endpoint is similar to specifying examples for ExDoc:
@@ -66,6 +88,8 @@ defmodule MyApp.UserController do
     @response 200, User, "User found"
     @response 403, "User not authorized"
     @response 404, "User not found"
+
+    @security ApiAuth, [read]
   """
   @spec show(any(), map()) :: nil
   def show(_conn, _params) do
@@ -75,7 +99,7 @@ end
 ```
 
 The above example shows how we can describe parameters and responses. The `[Swagdox] API:` tag is what signals
-a specification.
+a specification. The security tag should be a name of a registered authorization scheme.
 
 #### Parameters
 

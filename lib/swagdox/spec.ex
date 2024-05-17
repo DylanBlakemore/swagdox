@@ -2,6 +2,7 @@ defmodule Swagdox.Spec do
   @moduledoc """
   OpenAPI specification.
   """
+  alias Swagdox.Authorization
   alias Swagdox.Config
   alias Swagdox.Parameter
   alias Swagdox.Path
@@ -9,6 +10,7 @@ defmodule Swagdox.Spec do
   alias Swagdox.Response
   alias Swagdox.Schema
   alias Swagdox.SchemaBuilder
+  alias Swagdox.Security
 
   defstruct [
     :config,
@@ -70,6 +72,16 @@ defmodule Swagdox.Spec do
     %__MODULE__{spec | schemas: schemas}
   end
 
+  @doc """
+  Generates security schemes for the specification.
+  """
+  @spec generate_security_schemes(t()) :: t()
+  def generate_security_schemes(spec) do
+    security_schemes = Authorization.extract(spec.config.router)
+
+    %__MODULE__{spec | security: security_schemes}
+  end
+
   defp info(config) do
     %{
       title: config.title,
@@ -87,7 +99,8 @@ defmodule Swagdox.Spec do
       "paths" => render_paths(spec.paths),
       "tags" => [],
       "components" => %{
-        "schemas" => render_schemas(spec.schemas)
+        "schemas" => render_schemas(spec.schemas),
+        "securitySchemes" => render_security_schemes(spec.security)
       }
     }
   end
@@ -95,6 +108,12 @@ defmodule Swagdox.Spec do
   defp render_schemas(schemas) do
     Enum.reduce(schemas, %{}, fn schema, acc ->
       Map.merge(acc, Schema.render(schema))
+    end)
+  end
+
+  defp render_security_schemes(security_schemes) do
+    Enum.reduce(security_schemes, %{}, fn scheme, acc ->
+      Map.merge(acc, Authorization.render(scheme))
     end)
   end
 
@@ -132,7 +151,8 @@ defmodule Swagdox.Spec do
       "operationId" => Path.operation_id(path),
       "description" => path.description,
       "parameters" => render_parameters(path.parameters),
-      "responses" => render_responses(path.responses)
+      "responses" => render_responses(path.responses),
+      "security" => render_security(path.security)
     }
   end
 
@@ -140,13 +160,15 @@ defmodule Swagdox.Spec do
     Enum.map(parameters, &Parameter.render/1)
   end
 
-  defp render_responses(responses) do
-    case Enum.map(responses, &Response.render/1) do
-      [] ->
-        %{}
+  defp render_responses([]), do: %{}
 
-      responses ->
-        Enum.reduce(responses, &Map.merge/2)
-    end
+  defp render_responses(responses) do
+    responses
+    |> Enum.map(&Response.render/1)
+    |> Enum.reduce(&Map.merge/2)
+  end
+
+  defp render_security(security) do
+    Enum.map(security, &Security.render/1)
   end
 end

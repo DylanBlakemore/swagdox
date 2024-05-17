@@ -5,6 +5,7 @@ defmodule Swagdox.PathTest do
   alias Swagdox.Parameter
   alias Swagdox.Path
   alias Swagdox.Response
+  alias Swagdox.Security
 
   @create_endpoint %Endpoint{
     module: SwagdoxWeb.UserController,
@@ -39,6 +40,9 @@ defmodule Swagdox.PathTest do
       @response 200, User, "User found"
       @response 403, "User not authorized"
       @response 404, "User not found"
+
+      @security BasicAuth
+      @security ApiKey, [read, write]
     """
   }
 
@@ -83,6 +87,13 @@ defmodule Swagdox.PathTest do
 
     test "adjusts the path to obey the OpenAPI spec", %{show: show} do
       assert show.path == "/users/{id}"
+    end
+
+    test "creates the security options", %{show: show} do
+      assert show.security == [
+               %Security{name: "BasicAuth", scopes: []},
+               %Security{name: "ApiKey", scopes: ["read", "write"]}
+             ]
     end
   end
 

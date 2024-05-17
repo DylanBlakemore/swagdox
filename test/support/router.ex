@@ -1,6 +1,10 @@
 defmodule SwagdoxWeb.Router do
   @moduledoc """
   Routes for our SwagdoxWeb application.
+
+  [Swagdox] Router:
+    @authorization BasicAuth, basic, "Basic http authentication"
+    @authorization ApiKey, header("X-API-Key"), "API key authentication"
   """
   @type route :: %{
           path: String.t(),

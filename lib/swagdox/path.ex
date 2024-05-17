@@ -11,6 +11,7 @@ defmodule Swagdox.Path do
     :verb,
     :function,
     :controller,
+    security: [],
     parameters: [],
     responses: []
   ]
@@ -44,7 +45,8 @@ defmodule Swagdox.Path do
       function: endpoint.function,
       controller: endpoint.module,
       parameters: parameters(endpoint),
-      responses: responses(endpoint)
+      responses: responses(endpoint),
+      security: security(endpoint)
     }
   end
 
@@ -59,6 +61,10 @@ defmodule Swagdox.Path do
 
   defp responses(endpoint) do
     Endpoint.responses(endpoint)
+  end
+
+  defp security(endpoint) do
+    Endpoint.security(endpoint)
   end
 
   defp adjust_path(path) do
