@@ -1,6 +1,4 @@
 defmodule SwagdoxWeb.OrderController do
-  use Swagdox.Controller, schemas: [Swagdox.Order]
-
   @doc """
   Returns an Order.
 
