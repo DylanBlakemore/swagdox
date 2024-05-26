@@ -48,7 +48,7 @@ defmodule Swagdox.MixProject do
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:jason, "~> 1.4"},
       {:ymlr, "~> 5.0"},
-      {:ecto, "~> 3.11"}
+      {:ecto, "~> 3.11", only: [:dev, :test], runtime: false}
     ]
   end
 
