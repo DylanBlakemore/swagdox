@@ -2,7 +2,7 @@
 
 ![CI Pipeline](https://github.com/dylanblakemore/swagdox/actions/workflows/elixir.yml/badge.svg)
 [![Hex.pm](https://img.shields.io/hexpm/v/swagdox.svg)](https://hex.pm/packages/swagdox)
-[![Documentation](https://img.shields.io/badge/documentation-gray)](https://hexdocs.pm/swagdox/api-reference.html)
+[![Documentation](https://img.shields.io/badge/documentation-gray)](https://hexdocs.pm/swagdox/)
 
 Swagdox is a Swagger/OpenAPI specification generator inspired by [Swaggeryard](https://github.com/livingsocial/swagger_yard).
 
