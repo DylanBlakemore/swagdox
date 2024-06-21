@@ -5,13 +5,14 @@ defmodule Swagdox.MixProject do
     [
       app: :swagdox,
       description: "Generate OpenAPI specs from documentation comments in Elixir modules.",
-      version: "0.1.0",
+      version: "0.1.1",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       preferred_cli_env: ["test.all": :test],
       deps: deps(),
+      docs: docs(),
       dialyzer: [plt_add_apps: [:mix]],
       package: package(),
       source_url: "https://github.com/DylanBlakemore/swagdox",
@@ -64,6 +65,23 @@ defmodule Swagdox.MixProject do
         "test.coverage",
         "test.lint"
       ]
+    ]
+  end
+
+  defp docs do
+    [
+      main: "README",
+      formatters: ["html", "epub"],
+      extras: extras(),
+      skip_undefined_reference_warnings_on: ["CHANGELOG.md"]
+    ]
+  end
+
+  defp extras do
+    [
+      "README.md",
+      "CHANGELOG.md",
+      "LICENSE.md",
     ]
   end
 
