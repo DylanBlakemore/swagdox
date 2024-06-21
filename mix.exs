@@ -5,7 +5,7 @@ defmodule Swagdox.MixProject do
     [
       app: :swagdox,
       description: "Generate OpenAPI specs from documentation comments in Elixir modules.",
-      version: "0.1.1",
+      version: "0.1.2",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -44,7 +44,7 @@ defmodule Swagdox.MixProject do
 
   defp deps do
     [
-      {:ex_doc, "~> 0.31", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.31", only: [:dev, :docs], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:jason, "~> 1.4"},
@@ -70,7 +70,7 @@ defmodule Swagdox.MixProject do
 
   defp docs do
     [
-      main: "README",
+      main: "readme",
       formatters: ["html", "epub"],
       extras: extras(),
       skip_undefined_reference_warnings_on: ["CHANGELOG.md"]

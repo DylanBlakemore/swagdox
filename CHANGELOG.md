@@ -18,3 +18,9 @@
 
 - Add ReadMe, Changelog, and License to docs
 - Redirect docs to Readme
+
+## [0.1.2] - 21 June 2024
+
+### Documentation fix
+
+- Fix reference to readme html
