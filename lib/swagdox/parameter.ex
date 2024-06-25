@@ -2,6 +2,9 @@ defmodule Swagdox.Parameter do
   @moduledoc """
   Describes a parameter in an OpenAPI specification.
   """
+
+  alias Swagdox.Type
+
   defstruct [
     :name,
     :in,
@@ -9,8 +12,6 @@ defmodule Swagdox.Parameter do
     :description,
     :type
   ]
-
-  alias Swagdox.Type
 
   @type t :: %__MODULE__{
           name: String.t(),
@@ -57,10 +58,6 @@ defmodule Swagdox.Parameter do
       type: type
     }
   end
-
-  # def schema(type, _opts) do
-  #   raise ArgumentError, "Invalid type: #{type}"
-  # end
 
   @doc """
   Renders a Parameter as a map.
