@@ -24,3 +24,9 @@
 ### Documentation fix
 
 - Fix reference to readme html
+
+## [0.1.3] - 26 June 2024
+
+### Paramater fix
+
+- Fix parameter array types
