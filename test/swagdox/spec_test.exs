@@ -70,9 +70,7 @@ defmodule Swagdox.SpecTest do
             in: "query",
             description: "User ID",
             required: true,
-            schema: %{
-              type: "string"
-            }
+            type: "string"
           }
         ]
       },

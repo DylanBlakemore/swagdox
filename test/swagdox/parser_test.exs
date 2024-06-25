@@ -246,6 +246,13 @@ defmodule Swagdox.ParserTest do
       assert {:error, _reason} = Parser.parse_definition(line)
     end
 
+    test "parameter with array type" do
+      line = "@param id(body), [integer], \"User ID\""
+
+      assert Parser.parse_definition(line) ==
+               {:param, [{"id", "body"}, ["integer"], "User ID"]}
+    end
+
     test "invalid ast" do
       line = "%{hello: :world}"
 
