@@ -10,6 +10,8 @@ defmodule SwagdoxWeb.UserController do
     @response 404, "User not found"
 
     @security BasicAuth, [read]
+
+    @tags users
   """
   @spec show(any(), map()) :: nil
   def show(_conn, _params) do
@@ -32,6 +34,8 @@ defmodule SwagdoxWeb.UserController do
     @response 400, "Invalid user attributes"
 
     @security BasicAuth, [admin]
+
+    @tags users, creation
   """
   @spec create(any(), map()) :: nil
   def create(_conn, _params) do

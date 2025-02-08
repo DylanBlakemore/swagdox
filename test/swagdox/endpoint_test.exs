@@ -30,6 +30,8 @@ defmodule Swagdox.EndpointTest do
                @response 400, "Invalid user attributes"
 
                @security BasicAuth, [admin]
+
+               @tags users, creation
              """
     end
 
@@ -84,6 +86,31 @@ defmodule Swagdox.EndpointTest do
       assert_raise ArgumentError, fn ->
         Endpoint.parameters(endpoint)
       end
+    end
+  end
+
+  describe "tags/1" do
+    test "returns the tags for the endpoint" do
+      endpoint = %Endpoint{
+        module: UserController,
+        function: :create,
+        docstring: """
+        Creates a User.
+
+        [Swagdox] API:
+          @param user(body), object, "User attributes"
+          @param id(path), integer, "User ID", required: true
+
+          @response 201, User, "User created"
+          @response 400, "Invalid user attributes"
+
+          @tags users, creation
+        """
+      }
+
+      tags = Endpoint.tags(endpoint)
+
+      assert ["users", "creation"] = tags
     end
   end
 

@@ -59,6 +59,7 @@ defmodule SwagdoxTest do
     "paths" => %{
       "/orders" => %{
         "get" => %{
+          "tags" => [],
           "description" => "Returns a list of Orders",
           "operationId" => "SwagdoxWeb.OrderController-index",
           "parameters" => [],
@@ -79,6 +80,7 @@ defmodule SwagdoxTest do
           "security" => [%{"ApiKey" => ["read"]}]
         },
         "post" => %{
+          "tags" => [],
           "description" => "Creates an Order.",
           "operationId" => "SwagdoxWeb.OrderController-create",
           "parameters" => [],
@@ -96,6 +98,7 @@ defmodule SwagdoxTest do
       },
       "/orders/{id}" => %{
         "delete" => %{
+          "tags" => [],
           "description" => "Deletes an Order.",
           "operationId" => "SwagdoxWeb.OrderController-delete",
           "parameters" => [
@@ -115,6 +118,7 @@ defmodule SwagdoxTest do
           "security" => [%{"ApiKey" => ["write"]}]
         },
         "get" => %{
+          "tags" => ["orders"],
           "description" => "Returns an Order.",
           "operationId" => "SwagdoxWeb.OrderController-show",
           "parameters" => [
@@ -144,6 +148,7 @@ defmodule SwagdoxTest do
           "description" => "Creates a User.",
           "operationId" => "SwagdoxWeb.UserController-create",
           "parameters" => [],
+          "tags" => ["users", "creation"],
           "responses" => %{
             "201" => %{
               "content" => %{
@@ -158,6 +163,7 @@ defmodule SwagdoxTest do
       },
       "/users/{id}" => %{
         "get" => %{
+          "tags" => ["users"],
           "description" => "Returns a User.",
           "operationId" => "SwagdoxWeb.UserController-show",
           "parameters" => [

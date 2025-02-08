@@ -87,6 +87,19 @@ defmodule Swagdox.Endpoint do
   end
 
   @doc """
+  Returns the list of tags for the endpoint
+  """
+  @spec tags(t()) :: list(String.t())
+  def tags(endpoint) do
+    endpoint.docstring
+    |> Parser.extract_tags()
+    |> Enum.map(&Parser.parse_definition/1)
+    |> Enum.flat_map(&build_tags/1)
+  end
+
+  defp build_tags({:tags, tags}), do: tags
+
+  @doc """
   Extracts function docs that contain Open API specifications.
   A function doc is considered to contain an Open API specification if it contains
   the string "[Swagdox] API:", followed by one or more lines that start with @-variables.

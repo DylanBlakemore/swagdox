@@ -99,7 +99,8 @@ defmodule Swagdox.Response do
     }
   end
 
-  defp render_response(%__MODULE__{description: description, content: content}) do
+  defp render_response(response) do
+    %{description: description, content: content} = response
     rendered = %{"description" => description}
 
     case content do

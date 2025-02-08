@@ -73,6 +73,11 @@ defmodule Swagdox.Parser do
     extract_elements(docstring, "@security")
   end
 
+  @spec extract_tags(String.t()) :: list(String.t())
+  def extract_tags(docstring) do
+    extract_elements(docstring, "@tags")
+  end
+
   defp extract_elements(docstring, prefix) do
     docstring
     |> String.split(~r/\[Swagdox\] \w+:\n/)

@@ -43,6 +43,8 @@ defmodule Swagdox.PathTest do
 
       @security BasicAuth
       @security ApiKey, [read, write]
+
+      @tags users
     """
   }
 
@@ -87,6 +89,10 @@ defmodule Swagdox.PathTest do
 
     test "adjusts the path to obey the OpenAPI spec", %{show: show} do
       assert show.path == "/users/{id}"
+    end
+
+    test "extracts the tags from the docstring", %{show: show} do
+      assert show.tags == ["users"]
     end
 
     test "creates the security options", %{show: show} do

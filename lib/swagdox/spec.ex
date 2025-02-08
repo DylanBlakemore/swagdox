@@ -152,7 +152,8 @@ defmodule Swagdox.Spec do
       "description" => path.description,
       "parameters" => render_parameters(path.parameters),
       "responses" => render_responses(path.responses),
-      "security" => render_security(path.security)
+      "security" => render_security(path.security),
+      "tags" => path.tags
     }
   end
 

@@ -10,6 +10,8 @@ defmodule SwagdoxWeb.OrderController do
     @response 404, "Order not found"
 
     @security ApiKey, [read]
+
+    @tags orders
   """
   @spec show(any(), map()) :: nil
   def show(_conn, _params) do

@@ -13,7 +13,8 @@ defmodule Swagdox.Path do
     :controller,
     security: [],
     parameters: [],
-    responses: []
+    responses: [],
+    tags: []
   ]
 
   @type t :: %__MODULE__{}
@@ -46,7 +47,8 @@ defmodule Swagdox.Path do
       controller: endpoint.module,
       parameters: parameters(endpoint),
       responses: responses(endpoint),
-      security: security(endpoint)
+      security: security(endpoint),
+      tags: tags(endpoint)
     }
   end
 
@@ -65,6 +67,10 @@ defmodule Swagdox.Path do
 
   defp security(endpoint) do
     Endpoint.security(endpoint)
+  end
+
+  defp tags(endpoint) do
+    Endpoint.tags(endpoint)
   end
 
   defp adjust_path(path) do

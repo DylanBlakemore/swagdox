@@ -142,6 +142,19 @@ defmodule Swagdox.ParserTest do
     end
   end
 
+  describe "extract_tags/1" do
+    test "extracts endpoint tags from a docstring" do
+      docstring = """
+      Creates a User.
+
+      [Swagdox] API:
+        @tags users
+      """
+
+      assert Parser.extract_tags(docstring) == ["@tags users"]
+    end
+  end
+
   describe "extract_module_doc/1" do
     test "extracts the module docstring from a module" do
       module = Swagdox.User
@@ -168,6 +181,18 @@ defmodule Swagdox.ParserTest do
   end
 
   describe "parse_definition/1" do
+    test "tags" do
+      line = "@tags users"
+
+      assert Parser.parse_definition(line) ==
+               {:tags, ["users"]}
+
+      line = "@tags users, creation"
+
+      assert Parser.parse_definition(line) ==
+               {:tags, ["users", "creation"]}
+    end
+
     test "security scheme" do
       line = "@authorization BasicAuth, basic, \"Basic http authentication\""
 

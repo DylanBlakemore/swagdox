@@ -47,6 +47,7 @@ defmodule Swagdox.SpecTest do
         path: "/users",
         description: "Returns a list of users.",
         responses: [Response.build(200, ["User"], "List of users")],
+        tags: ["users"],
         security: [
           %Security{name: "BasicAuth", scopes: []}
         ]
@@ -55,6 +56,7 @@ defmodule Swagdox.SpecTest do
         verb: "post",
         path: "/users",
         description: "Creates a User.",
+        tags: ["users"],
         responses: [
           Response.build(201, "User", "User created"),
           Response.build(400, "Invalid user attributes")
@@ -64,6 +66,7 @@ defmodule Swagdox.SpecTest do
         verb: "get",
         path: "/users/{id}",
         description: "Returns a User.",
+        tags: ["users"],
         parameters: [
           %Parameter{
             name: "id",
@@ -77,6 +80,7 @@ defmodule Swagdox.SpecTest do
       %Path{
         verb: "get",
         path: "/orders",
+        tags: ["orders"],
         description: "Returns a list of orders."
       }
     ]
@@ -219,6 +223,7 @@ defmodule Swagdox.SpecTest do
                  "get" => %{
                    "description" => "Returns a list of users.",
                    "security" => [%{"BasicAuth" => []}],
+                   "tags" => ["users"],
                    "responses" => %{
                      "200" => %{
                        "content" => %{
@@ -236,6 +241,7 @@ defmodule Swagdox.SpecTest do
                  "post" => %{
                    "description" => "Creates a User.",
                    "security" => [],
+                   "tags" => ["users"],
                    "responses" => %{
                      "201" => %{
                        "content" => %{
@@ -251,6 +257,7 @@ defmodule Swagdox.SpecTest do
                },
                "/users/{id}" => %{
                  "get" => %{
+                   "tags" => ["users"],
                    "description" => "Returns a User.",
                    "security" => [],
                    "parameters" => [
@@ -269,6 +276,7 @@ defmodule Swagdox.SpecTest do
                },
                "/orders" => %{
                  "get" => %{
+                   "tags" => ["orders"],
                    "security" => [],
                    "description" => "Returns a list of orders.",
                    "responses" => %{}
