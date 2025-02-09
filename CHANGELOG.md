@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.2.0] - 09 February 2025
+
+### Tags and Schema examples
+
+- Adds the ability to tag endpoints using the `@tag` syntax
+- Adds the ability to provide an example for a schema using `@example` syntax
+
+## [0.1.3] - 26 June 2024
+
+### Paramater fix
+
+- Fix parameter array types
+
+## [0.1.2] - 21 June 2024
+
+### Documentation fix
+
+- Fix reference to readme html
+
+## [0.1.1] - 21 June 2024
+
+### Documentation improvements
+
+- Add ReadMe, Changelog, and License to docs
+- Redirect docs to Readme
+
 ## [0.1.0] - 26 May 2024
 
 ### First release
@@ -12,21 +38,8 @@
   - Controllers are detected by defining the router module
   - Endpoints are detected within the controller by the presence of `[Swagdox] API:` tag
 
-## [0.1.1] - 21 June 2024
 
-### Documentation improvements
 
-- Add ReadMe, Changelog, and License to docs
-- Redirect docs to Readme
 
-## [0.1.2] - 21 June 2024
 
-### Documentation fix
 
-- Fix reference to readme html
-
-## [0.1.3] - 26 June 2024
-
-### Paramater fix
-
-- Fix parameter array types
