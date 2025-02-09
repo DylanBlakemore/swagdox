@@ -20,7 +20,8 @@ defmodule SwagdoxTest do
         "OrderName" => %{
           "description" => "An order placed by a customer",
           "properties" => %{"item" => %{"type" => "string"}, "number" => %{"type" => "integer"}},
-          "type" => "object"
+          "type" => "object",
+          "example" => %{item: "item", number: 1}
         },
         "User" => %{
           "description" => "A user of the application",

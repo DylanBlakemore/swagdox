@@ -13,12 +13,17 @@ defmodule Swagdox.SchemaTest do
     assert Schema.description(Order) == "An order placed by a customer"
   end
 
+  test "example/1" do
+    assert Schema.example(Order) == %{item: "item", number: 1}
+  end
+
   test "infer/1" do
     assert Schema.infer(Order) == %Schema{
              type: "object",
              module: Order,
              properties: [{"item", "string"}, {"number", "integer"}],
-             description: "An order placed by a customer"
+             description: "An order placed by a customer",
+             example: %{item: "item", number: 1}
            }
   end
 

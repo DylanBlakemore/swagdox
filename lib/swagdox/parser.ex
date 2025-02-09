@@ -6,10 +6,6 @@ defmodule Swagdox.Parser do
   @locations ["query", "header", "path", "cookie", "body"]
   @local "en"
 
-  defmodule ParserError do
-    defexception message: "Parser error"
-  end
-
   defguardp is_primitive(value) when is_binary(value) or is_boolean(value) or is_number(value)
 
   @doc """
@@ -78,12 +74,22 @@ defmodule Swagdox.Parser do
     extract_elements(docstring, "@tags")
   end
 
+  @spec extract_example(String.t()) :: list(String.t())
+  def extract_example(docstring) do
+    extract_elements(docstring, "@example")
+  end
+
   defp extract_elements(docstring, prefix) do
-    docstring
-    |> String.split(~r/\[Swagdox\] \w+:\n/)
-    |> Enum.at(1)
-    |> String.split("\n")
-    |> Enum.map(&String.trim/1)
+    regex_pattern = ~r/(@[^@]*)/
+
+    specstring =
+      docstring
+      |> String.split(~r/\[Swagdox\] \w+:\n/)
+      |> Enum.at(1)
+
+    regex_pattern
+    |> Regex.scan(specstring)
+    |> Enum.map(&String.trim(hd(&1)))
     |> Enum.filter(&String.starts_with?(&1, prefix))
   end
 
@@ -166,11 +172,13 @@ defmodule Swagdox.Parser do
     {to_string(name), parse_node(value)}
   end
 
-  defp parse_node(node) when is_list(node) do
-    Enum.map(node, &parse_node/1)
+  defp parse_node({:%{}, _meta, items}) do
+    items
+    |> Enum.map(fn {k, v} -> {k, parse_node(v)} end)
+    |> Enum.into(%{})
   end
 
-  defp parse_node(node) do
-    raise ParserError, message: "Unable to parse node: #{inspect(node)}"
+  defp parse_node(node) when is_list(node) do
+    Enum.map(node, &parse_node/1)
   end
 end

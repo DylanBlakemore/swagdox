@@ -155,6 +155,25 @@ defmodule Swagdox.ParserTest do
     end
   end
 
+  describe "extract_example/1" do
+    test "extracts an example from a docstring" do
+      docstring = """
+      Creates a User.
+
+      [Swagdox] Schema:
+        @name User
+        @example %{
+          item: "item",
+          number: 1
+        }
+      """
+
+      assert Parser.extract_example(docstring) == [
+               "@example %{\n    item: \"item\",\n    number: 1\n  }"
+             ]
+    end
+  end
+
   describe "extract_module_doc/1" do
     test "extracts the module docstring from a module" do
       module = Swagdox.User
@@ -181,6 +200,13 @@ defmodule Swagdox.ParserTest do
   end
 
   describe "parse_definition/1" do
+    test "examples" do
+      line = "@example %{\n  item: \"item\",\n  number: 1\n}"
+
+      assert Parser.parse_definition(line) ==
+               {:example, [%{item: "item", number: 1}]}
+    end
+
     test "tags" do
       line = "@tags users"
 
@@ -290,13 +316,6 @@ defmodule Swagdox.ParserTest do
 
       assert Parser.parse_definition(line) ==
                {:error, "Unable to parse line: .> ("}
-    end
-
-    test "node error" do
-      line = "@param user(body), map, %{hello: :world}"
-
-      assert Parser.parse_definition(line) ==
-               {:error, "Unable to parse node: {:%{}, [line: 1], [hello: :world]}"}
     end
 
     test "parses a line with all arguments" do

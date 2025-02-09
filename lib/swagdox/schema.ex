@@ -5,7 +5,7 @@ defmodule Swagdox.Schema do
   alias Swagdox.Parser
   alias Swagdox.Type
 
-  defstruct [:module, :description, :type, properties: %{}, required: []]
+  defstruct [:module, :description, :example, :type, properties: %{}, required: []]
 
   @type property :: {atom(), atom()}
   @type t :: %__MODULE__{
@@ -22,8 +22,24 @@ defmodule Swagdox.Schema do
       module: module,
       type: "object",
       properties: properties(module),
-      description: description(module)
+      description: description(module),
+      example: example(module)
     }
+  end
+
+  @spec example(module()) :: any()
+  def example(schema) do
+    examples =
+      schema
+      |> Parser.extract_module_doc()
+      |> Parser.extract_example()
+      |> Enum.map(&Parser.parse_definition/1)
+
+    case examples do
+      [] -> nil
+      [{:example, [example]}] -> example
+      [_first, _second | _rest] -> raise "Schemas only support a single example"
+    end
   end
 
   @spec description(module()) :: String.t()
@@ -75,13 +91,21 @@ defmodule Swagdox.Schema do
   def render(schema) do
     name = name(schema)
 
-    %{
-      name => %{
+    rendered =
+      %{
         "description" => schema.description,
         "type" => schema.type,
         "properties" => render_properties(schema.properties)
       }
-    }
+      |> render_example(schema)
+
+    %{name => rendered}
+  end
+
+  defp render_example(rendered, %{example: nil}), do: rendered
+
+  defp render_example(rendered, %{example: example}) do
+    Map.put(rendered, "example", example)
   end
 
   defp render_properties(properties) do

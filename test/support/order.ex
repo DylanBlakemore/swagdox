@@ -7,6 +7,11 @@ defmodule Swagdox.Order do
 
     @property item, string, "Order item"
     @property number, integer, "Order number"
+
+    @example %{
+      item: "item",
+      number: 1
+    }
   """
   use Ecto.Schema
 
