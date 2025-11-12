@@ -28,7 +28,7 @@ defmodule SwagdoxWeb.UserController do
   Creates a User.
 
   [Swagdox] API:
-    @param user(body), object, "User attributes", required: true
+    @param user(body), User, "User attributes", required: true
 
     @response 201, User, "User created"
     @response 400, "Invalid user attributes"

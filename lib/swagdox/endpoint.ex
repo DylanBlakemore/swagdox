@@ -20,7 +20,7 @@ defmodule Swagdox.Endpoint do
   @locale "en"
 
   @doc """
-  Returns the parameters for the endpoint.
+  Returns the parameters for the endpoint (excluding body parameters).
   """
   @spec parameters(t()) :: list(Parameter.t())
   def parameters(endpoint) do
@@ -28,6 +28,19 @@ defmodule Swagdox.Endpoint do
     |> Parser.extract_params()
     |> Enum.map(&Parser.parse_definition/1)
     |> Enum.reject(&body_param?/1)
+    |> Enum.map(&build_param/1)
+  end
+
+  @doc """
+  Returns the request body parameters for the endpoint, if any.
+  Returns a list of body parameters (can be combined into a single requestBody schema).
+  """
+  @spec request_body(t()) :: list(Parameter.t())
+  def request_body(endpoint) do
+    endpoint.docstring
+    |> Parser.extract_params()
+    |> Enum.map(&Parser.parse_definition/1)
+    |> Enum.filter(&body_param?/1)
     |> Enum.map(&build_param/1)
   end
 

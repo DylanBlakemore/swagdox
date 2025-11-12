@@ -48,6 +48,7 @@ defmodule Swagdox.SpecTest do
         description: "Returns a list of users.",
         responses: [Response.build(200, ["User"], "List of users")],
         tags: ["users"],
+        request_body: [],
         security: [
           %Security{name: "BasicAuth", scopes: []}
         ]
@@ -57,6 +58,9 @@ defmodule Swagdox.SpecTest do
         path: "/users",
         description: "Creates a User.",
         tags: ["users"],
+        request_body: [
+          Parameter.build({"user", "body"}, "User", "User attributes", required: true)
+        ],
         responses: [
           Response.build(201, "User", "User created"),
           Response.build(400, "Invalid user attributes")
@@ -67,6 +71,7 @@ defmodule Swagdox.SpecTest do
         path: "/users/{id}",
         description: "Returns a User.",
         tags: ["users"],
+        request_body: [],
         parameters: [
           %Parameter{
             name: "id",
@@ -81,7 +86,8 @@ defmodule Swagdox.SpecTest do
         verb: "get",
         path: "/orders",
         tags: ["orders"],
-        description: "Returns a list of orders."
+        description: "Returns a list of orders.",
+        request_body: []
       }
     ]
 
@@ -217,6 +223,47 @@ defmodule Swagdox.SpecTest do
              } = spec |> Spec.generate_schemas() |> Spec.render()
     end
 
+    test "renders requestBody with multiple body parameters" do
+      path = %Path{
+        verb: "post",
+        path: "/users",
+        description: "Creates a User.",
+        tags: ["users"],
+        request_body: [
+          Parameter.build({"user", "body"}, "User", "User attributes", required: true),
+          Parameter.build({"metadata", "body"}, "object", "Additional metadata")
+        ],
+        responses: [
+          Response.build(201, "User", "User created")
+        ]
+      }
+
+      spec = %{spec() | paths: [path]}
+      rendered = Spec.render(spec)
+
+      assert %{
+               "/users" => %{
+                 "post" => %{
+                   "requestBody" => %{
+                     "required" => true,
+                     "content" => %{
+                       "application/json" => %{
+                         "schema" => %{
+                           "type" => "object",
+                           "properties" => %{
+                             "user" => %{"$ref" => "#/components/schemas/User"},
+                             "metadata" => %{"type" => "object"}
+                           },
+                           "required" => ["user"]
+                         }
+                       }
+                     }
+                   }
+                 }
+               }
+             } = rendered["paths"]
+    end
+
     test "renders the paths", %{spec: spec} do
       assert %{
                "/users" => %{
@@ -242,6 +289,14 @@ defmodule Swagdox.SpecTest do
                    "description" => "Creates a User.",
                    "security" => [],
                    "tags" => ["users"],
+                   "requestBody" => %{
+                     "required" => true,
+                     "content" => %{
+                       "application/json" => %{
+                         "schema" => %{"$ref" => "#/components/schemas/User"}
+                       }
+                     }
+                   },
                    "responses" => %{
                      "201" => %{
                        "content" => %{

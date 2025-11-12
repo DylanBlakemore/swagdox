@@ -24,7 +24,7 @@ defmodule Swagdox.EndpointTest do
              Creates a User.
 
              [Swagdox] API:
-               @param user(body), object, "User attributes", required: true
+               @param user(body), User, "User attributes", required: true
 
                @response 201, User, "User created"
                @response 400, "Invalid user attributes"
@@ -178,6 +178,111 @@ defmodule Swagdox.EndpointTest do
                  scopes: ["admin", "write"]
                }
              ] = security
+    end
+  end
+
+  describe "request_body/1" do
+    test "returns the request body parameter when present" do
+      endpoint = %Endpoint{
+        module: UserController,
+        function: :create,
+        docstring: """
+        Creates a User.
+
+        [Swagdox] API:
+          @param user(body), User, "User attributes", required: true
+
+          @response 201, User, "User created"
+        """
+      }
+
+      request_body = Endpoint.request_body(endpoint)
+
+      assert [
+               %Parameter{
+                 name: "user",
+                 in: "body",
+                 type: "User",
+                 description: "User attributes",
+                 required: true
+               }
+             ] = request_body
+    end
+
+    test "returns empty list when no body parameter is present" do
+      endpoint = %Endpoint{
+        module: UserController,
+        function: :show,
+        docstring: """
+        Returns a User.
+
+        [Swagdox] API:
+          @param id(path), integer, "User ID", required: true
+
+          @response 200, User, "User found"
+        """
+      }
+
+      assert Endpoint.request_body(endpoint) == []
+    end
+
+    test "returns the request body when header and body parameters are both present" do
+      endpoint = %Endpoint{
+        module: UserController,
+        function: :create,
+        docstring: """
+        Creates a User.
+
+        [Swagdox] API:
+          @param organisation(header), string, "The organisation UUID", required: true
+          @param user(body), User, "User attributes", required: true
+
+          @response 201, User, "User created"
+        """
+      }
+
+      request_body = Endpoint.request_body(endpoint)
+
+      assert [
+               %Parameter{
+                 name: "user",
+                 in: "body",
+                 type: "User",
+                 required: true
+               }
+             ] = request_body
+    end
+
+    test "returns all body parameters when multiple body parameters are present" do
+      endpoint = %Endpoint{
+        module: UserController,
+        function: :create,
+        docstring: """
+        Creates a User.
+
+        [Swagdox] API:
+          @param user(body), User, "User attributes", required: true
+          @param metadata(body), object, "Additional metadata"
+
+          @response 201, User, "User created"
+        """
+      }
+
+      request_body = Endpoint.request_body(endpoint)
+
+      assert [
+               %Parameter{
+                 name: "user",
+                 in: "body",
+                 type: "User",
+                 required: true
+               },
+               %Parameter{
+                 name: "metadata",
+                 in: "body",
+                 type: "object"
+               }
+             ] = request_body
     end
   end
 end

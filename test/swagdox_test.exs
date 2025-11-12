@@ -84,7 +84,23 @@ defmodule SwagdoxTest do
           "tags" => [],
           "description" => "Creates an Order.",
           "operationId" => "SwagdoxWeb.OrderController-create",
-          "parameters" => [],
+          "parameters" => [
+            %{
+              "description" => "The organisation UUID",
+              "in" => "header",
+              "name" => "organisation",
+              "required" => true,
+              "schema" => %{"type" => "string"}
+            }
+          ],
+          "requestBody" => %{
+            "required" => true,
+            "content" => %{
+              "application/json" => %{
+                "schema" => %{"$ref" => "#/components/schemas/OrderName"}
+              }
+            }
+          },
           "responses" => %{
             "201" => %{
               "content" => %{
@@ -149,6 +165,14 @@ defmodule SwagdoxTest do
           "description" => "Creates a User.",
           "operationId" => "SwagdoxWeb.UserController-create",
           "parameters" => [],
+          "requestBody" => %{
+            "required" => true,
+            "content" => %{
+              "application/json" => %{
+                "schema" => %{"$ref" => "#/components/schemas/User"}
+              }
+            }
+          },
           "tags" => ["users", "creation"],
           "responses" => %{
             "201" => %{

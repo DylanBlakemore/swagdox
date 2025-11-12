@@ -101,6 +101,101 @@ defmodule Swagdox.PathTest do
                %Security{name: "ApiKey", scopes: ["read", "write"]}
              ]
     end
+
+    test "creates the request body when body parameter is present" do
+      endpoint = %Endpoint{
+        module: SwagdoxWeb.UserController,
+        function: :create,
+        docstring: """
+        Creates a User.
+
+        [Swagdox] API:
+          @param user(body), User, "User attributes", required: true
+
+          @response 201, User, "User created"
+        """
+      }
+
+      route = %{
+        path: "/users",
+        plug: SwagdoxWeb.UserController,
+        plug_opts: :create,
+        verb: :post
+      }
+
+      path = Path.build(endpoint, route)
+
+      assert [
+               %Parameter{
+                 name: "user",
+                 in: "body",
+                 type: "User",
+                 required: true
+               }
+             ] = path.request_body
+    end
+
+    test "sets request_body to empty list when no body parameter is present", %{show: show} do
+      assert show.request_body == []
+    end
+
+    test "creates both parameters and request_body when header and body parameters are present" do
+      endpoint = %Endpoint{
+        module: SwagdoxWeb.UserController,
+        function: :create,
+        docstring: """
+        Creates a User.
+
+        [Swagdox] API:
+          @param organisation(header), string, "The organisation UUID", required: true
+          @param user(body), User, "User attributes", required: true
+
+          @response 201, User, "User created"
+        """
+      }
+
+      route = %{
+        path: "/users",
+        plug: SwagdoxWeb.UserController,
+        plug_opts: :create,
+        verb: :post
+      }
+
+      path = Path.build(endpoint, route)
+
+      assert [%Parameter{name: "organisation", in: "header"}] = path.parameters
+      assert [%Parameter{name: "user", in: "body"}] = path.request_body
+    end
+
+    test "creates request_body with multiple body parameters" do
+      endpoint = %Endpoint{
+        module: SwagdoxWeb.UserController,
+        function: :create,
+        docstring: """
+        Creates a User.
+
+        [Swagdox] API:
+          @param user(body), User, "User attributes", required: true
+          @param metadata(body), object, "Additional metadata"
+
+          @response 201, User, "User created"
+        """
+      }
+
+      route = %{
+        path: "/users",
+        plug: SwagdoxWeb.UserController,
+        plug_opts: :create,
+        verb: :post
+      }
+
+      path = Path.build(endpoint, route)
+
+      assert [
+               %Parameter{name: "user", in: "body", required: true},
+               %Parameter{name: "metadata", in: "body"}
+             ] = path.request_body
+    end
   end
 
   describe "operation_id/1" do
