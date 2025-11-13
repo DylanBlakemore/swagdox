@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.2.1] - 13 November 2025
+
+- Adds request body parameters to spec
+
 ## [0.2.0] - 09 February 2025
 
 ### Tags and Schema examples
