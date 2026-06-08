@@ -118,7 +118,11 @@ defmodule Swagdox.SpecTest do
                  %Schema{
                    module: Swagdox.Order,
                    type: "object",
-                   properties: [{"item", "string", []}, {"number", "integer", []}],
+                   properties: [
+                     {"item", "string", [min_length: 1]},
+                     {"number", "integer", [minimum: 1]},
+                     {"status", "string", [enum: ["pending", "shipped", "delivered"]]}
+                   ],
                    required: []
                  },
                  %Schema{
@@ -126,9 +130,9 @@ defmodule Swagdox.SpecTest do
                    type: "object",
                    properties: [
                      {"id", "integer", []},
-                     {"name", "string", []},
-                     {"email", "string", []},
-                     {"orders", ["OrderName"], []}
+                     {"name", "string", [nullable: true]},
+                     {"email", "string", [format: "email"]},
+                     {"orders", ["OrderName"], [max_items: 100]}
                    ],
                    required: []
                  }

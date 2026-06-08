@@ -186,9 +186,9 @@ defmodule Swagdox.ParserTest do
                  @name User
 
                  @property id, integer, "User id"
-                 @property name, string, "User name"
-                 @property email, string, "User email"
-                 @property orders, [OrderName], "User orders"
+                 @property name, string, "User name", nullable: true
+                 @property email, string, "User email", format: "email"
+                 @property orders, [OrderName], "User orders", max_items: 100
                """
     end
 
