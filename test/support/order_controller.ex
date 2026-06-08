@@ -35,7 +35,7 @@ defmodule SwagdoxWeb.OrderController do
 
   [Swagdox] API:
     @param order(body), OrderName, "Order attributes", required: true
-    @param organisation(header), string, "The organisation UUID", required: true
+    @param organisation(header), string, "The organisation UUID", required: true, format: "uuid"
 
     @response 201, OrderName, "Order created"
     @response 400, "Invalid order attributes"

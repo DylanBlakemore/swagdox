@@ -6,7 +6,11 @@ defmodule Swagdox.SchemaTest do
   alias Swagdox.User
 
   test "properties/1" do
-    assert Schema.properties(Order) == [{"item", "string"}, {"number", "integer"}]
+    assert Schema.properties(Order) == [
+             {"item", "string", [min_length: 1]},
+             {"number", "integer", [minimum: 1]},
+             {"status", "string", [enum: ["pending", "shipped", "delivered"]]}
+           ]
   end
 
   test "description/1" do
@@ -21,7 +25,11 @@ defmodule Swagdox.SchemaTest do
     assert Schema.infer(Order) == %Schema{
              type: "object",
              module: Order,
-             properties: [{"item", "string"}, {"number", "integer"}],
+             properties: [
+               {"item", "string", [min_length: 1]},
+               {"number", "integer", [minimum: 1]},
+               {"status", "string", [enum: ["pending", "shipped", "delivered"]]}
+             ],
              description: "An order placed by a customer",
              example: %{item: "item", number: 1}
            }
@@ -46,7 +54,7 @@ defmodule Swagdox.SchemaTest do
     schema = %Schema{
       type: "object",
       module: Order,
-      properties: [{"item", "string"}, {"number", "integer"}]
+      properties: [{"item", "string", []}, {"number", "integer", []}]
     }
 
     assert Schema.render(schema) == %{
@@ -61,6 +69,40 @@ defmodule Swagdox.SchemaTest do
            }
   end
 
+  test "render/2 with property constraints" do
+    schema = %Schema{
+      type: "object",
+      module: Order,
+      properties: [
+        {"status", "string", [enum: ["new", "done"]]},
+        {"created_at", "string", [format: "date-time"]}
+      ]
+    }
+
+    assert %{
+             "OrderName" => %{
+               "properties" => %{
+                 "status" => %{"type" => "string", "enum" => ["new", "done"]},
+                 "created_at" => %{"type" => "string", "format" => "date-time"}
+               }
+             }
+           } = Schema.render(schema)
+  end
+
+  test "render/2 renders nullable per the OpenAPI version" do
+    schema = %Schema{
+      type: "object",
+      module: Order,
+      properties: [{"title", "string", [nullable: true]}]
+    }
+
+    assert %{"OrderName" => %{"properties" => %{"title" => %{"nullable" => true}}}} =
+             Schema.render(schema, "3.0.0")
+
+    assert %{"OrderName" => %{"properties" => %{"title" => %{"type" => ["string", "null"]}}}} =
+             Schema.render(schema, "3.1.0")
+  end
+
   test "render/1 with arrays" do
     schema = Schema.infer(User)
 
@@ -68,11 +110,12 @@ defmodule Swagdox.SchemaTest do
              "User" => %{
                "description" => "A user of the application",
                "properties" => %{
-                 "email" => %{"type" => "string"},
+                 "email" => %{"type" => "string", "format" => "email"},
                  "id" => %{"type" => "integer"},
-                 "name" => %{"type" => "string"},
+                 "name" => %{"type" => "string", "nullable" => true},
                  "orders" => %{
                    "type" => "array",
+                   "maxItems" => 100,
                    "items" => %{"$ref" => "#/components/schemas/OrderName"}
                  }
                },

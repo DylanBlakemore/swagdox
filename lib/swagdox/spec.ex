@@ -96,18 +96,18 @@ defmodule Swagdox.Spec do
       "openapi" => spec.openapi,
       "info" => render_info(spec.info),
       "servers" => render_servers(spec.servers),
-      "paths" => render_paths(spec.paths),
+      "paths" => render_paths(spec.paths, spec.openapi),
       "tags" => [],
       "components" => %{
-        "schemas" => render_schemas(spec.schemas),
+        "schemas" => render_schemas(spec.schemas, spec.openapi),
         "securitySchemes" => render_security_schemes(spec.security)
       }
     }
   end
 
-  defp render_schemas(schemas) do
+  defp render_schemas(schemas, version) do
     Enum.reduce(schemas, %{}, fn schema, acc ->
-      Map.merge(acc, Schema.render(schema))
+      Map.merge(acc, Schema.render(schema, version))
     end)
   end
 
@@ -133,7 +133,7 @@ defmodule Swagdox.Spec do
     end)
   end
 
-  defp render_paths(paths) do
+  defp render_paths(paths, version) do
     operation_ids = assign_operation_ids(paths)
     grouped_paths = Enum.group_by(paths, & &1.path)
 
@@ -141,7 +141,7 @@ defmodule Swagdox.Spec do
       acc_path =
         Enum.reduce(paths, %{}, fn path, acc_path ->
           operation_id = Map.fetch!(operation_ids, {path.path, path.verb})
-          Map.put(acc_path, to_string(path.verb), render_path(path, operation_id))
+          Map.put(acc_path, to_string(path.verb), render_path(path, operation_id, version))
         end)
 
       Map.put(acc, path, acc_path)
@@ -182,11 +182,11 @@ defmodule Swagdox.Spec do
     |> String.replace("/", "-")
   end
 
-  defp render_path(path, operation_id) do
+  defp render_path(path, operation_id, version) do
     base = %{
       "operationId" => operation_id,
       "description" => path.description,
-      "parameters" => render_parameters(path.parameters),
+      "parameters" => render_parameters(path.parameters, version),
       "responses" => render_responses(path.responses),
       "security" => render_security(path.security),
       "tags" => path.tags
@@ -195,30 +195,31 @@ defmodule Swagdox.Spec do
     case path.request_body do
       nil -> base
       [] -> base
-      body_params -> Map.put(base, "requestBody", render_request_body(body_params))
+      body_params -> Map.put(base, "requestBody", render_request_body(body_params, version))
     end
   end
 
-  defp render_parameters(parameters) do
-    Enum.map(parameters, &Parameter.render/1)
+  defp render_parameters(parameters, version) do
+    Enum.map(parameters, &Parameter.render(&1, version))
   end
 
-  defp render_request_body([single_param]) do
+  defp render_request_body([single_param], version) do
     %{
       "required" => single_param.required,
       "content" => %{
         "application/json" => %{
-          "schema" => Swagdox.Type.render(single_param.type)
+          "schema" => Swagdox.Type.render(single_param.type, single_param.constraints, version)
         }
       }
     }
   end
 
-  defp render_request_body(body_params) when is_list(body_params) and length(body_params) > 1 do
+  defp render_request_body(body_params, version)
+       when is_list(body_params) and length(body_params) > 1 do
     # Combine multiple body parameters into a single object schema with properties
     properties =
       Enum.reduce(body_params, %{}, fn param, acc ->
-        Map.put(acc, param.name, Swagdox.Type.render(param.type))
+        Map.put(acc, param.name, Swagdox.Type.render(param.type, param.constraints, version))
       end)
 
     required_fields =

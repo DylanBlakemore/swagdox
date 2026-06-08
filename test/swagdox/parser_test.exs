@@ -186,9 +186,9 @@ defmodule Swagdox.ParserTest do
                  @name User
 
                  @property id, integer, "User id"
-                 @property name, string, "User name"
-                 @property email, string, "User email"
-                 @property orders, [OrderName], "User orders"
+                 @property name, string, "User name", nullable: true
+                 @property email, string, "User email", format: "email"
+                 @property orders, [OrderName], "User orders", max_items: 100
                """
     end
 
@@ -250,6 +250,20 @@ defmodule Swagdox.ParserTest do
 
       assert Parser.parse_definition(line) ==
                {:property, ["user", ["User"], "User object"]}
+    end
+
+    test "property with constraint options" do
+      line = "@property status, string, \"Status\", enum: [\"a\", \"b\"]"
+
+      assert Parser.parse_definition(line) ==
+               {:property, ["status", "string", "Status", [enum: ["a", "b"]]]}
+    end
+
+    test "param with a size constraint" do
+      line = "@param body(body), [User], \"Users\", required: true, min_items: 1"
+
+      assert Parser.parse_definition(line) ==
+               {:param, [{"body", "body"}, ["User"], "Users", [required: true, min_items: 1]]}
     end
 
     test "list types" do

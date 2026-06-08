@@ -19,19 +19,27 @@ defmodule SwagdoxTest do
       "schemas" => %{
         "OrderName" => %{
           "description" => "An order placed by a customer",
-          "properties" => %{"item" => %{"type" => "string"}, "number" => %{"type" => "integer"}},
+          "properties" => %{
+            "item" => %{"type" => "string", "minLength" => 1},
+            "number" => %{"type" => "integer", "minimum" => 1},
+            "status" => %{
+              "type" => "string",
+              "enum" => ["pending", "shipped", "delivered"]
+            }
+          },
           "type" => "object",
           "example" => %{item: "item", number: 1}
         },
         "User" => %{
           "description" => "A user of the application",
           "properties" => %{
-            "email" => %{"type" => "string"},
+            "email" => %{"type" => "string", "format" => "email"},
             "id" => %{"type" => "integer"},
-            "name" => %{"type" => "string"},
+            "name" => %{"type" => "string", "nullable" => true},
             "orders" => %{
               "items" => %{"$ref" => "#/components/schemas/OrderName"},
-              "type" => "array"
+              "type" => "array",
+              "maxItems" => 100
             }
           },
           "type" => "object"
@@ -90,7 +98,7 @@ defmodule SwagdoxTest do
               "in" => "header",
               "name" => "organisation",
               "required" => true,
-              "schema" => %{"type" => "string"}
+              "schema" => %{"type" => "string", "format" => "uuid"}
             }
           ],
           "requestBody" => %{

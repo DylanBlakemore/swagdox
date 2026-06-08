@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Features
+
+- Add constraint options to the `@param` and `@property` DSL: `enum`, `nullable`, `format`,
+  `min_length`/`max_length`, `minimum`/`maximum`, `pattern`, and `min_items`/`max_items`.
+  Scalar constraints apply to array items; `min_items`/`max_items` apply to the array. Nullable
+  rendering follows the configured `openapi_version` (`nullable: true` for 3.0, a `"null"` type
+  union for 3.1) ([#1](https://github.com/DylanBlakemore/swagdox/issues/1)).
+
 ### Fixes
 
 - De-duplicate `operationId`s so the spec stays OpenAPI-valid when one action serves

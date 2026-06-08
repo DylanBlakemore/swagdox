@@ -5,8 +5,9 @@ defmodule Swagdox.Order do
   [Swagdox] Schema:
     @name OrderName
 
-    @property item, string, "Order item"
-    @property number, integer, "Order number"
+    @property item, string, "Order item", min_length: 1
+    @property number, integer, "Order number", minimum: 1
+    @property status, string, "Order status", enum: ["pending", "shipped", "delivered"]
 
     @example %{
       item: "item",

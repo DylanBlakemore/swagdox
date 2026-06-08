@@ -7,7 +7,7 @@ defmodule Swagdox.Schema do
 
   defstruct [:module, :description, :example, :type, properties: %{}, required: []]
 
-  @type property :: {atom(), atom()}
+  @type property :: {atom(), atom(), keyword()}
   @type t :: %__MODULE__{
           type: String.t(),
           module: module(),
@@ -53,8 +53,9 @@ defmodule Swagdox.Schema do
   def properties(schema) do
     schema
     |> extract_properties()
-    |> Enum.map(fn {:property, [name, type, _description]} ->
-      {name, type}
+    |> Enum.map(fn
+      {:property, [name, type, _description]} -> {name, type, []}
+      {:property, [name, type, _description, constraints]} -> {name, type, constraints}
     end)
   end
 
@@ -88,14 +89,15 @@ defmodule Swagdox.Schema do
   end
 
   @spec render(t()) :: map()
-  def render(schema) do
+  @spec render(t(), String.t()) :: map()
+  def render(schema, version \\ "3.0.0") do
     name = name(schema)
 
     rendered =
       %{
         "description" => schema.description,
         "type" => schema.type,
-        "properties" => render_properties(schema.properties)
+        "properties" => render_properties(schema.properties, version)
       }
       |> render_example(schema)
 
@@ -108,9 +110,9 @@ defmodule Swagdox.Schema do
     Map.put(rendered, "example", example)
   end
 
-  defp render_properties(properties) do
-    Enum.into(properties, %{}, fn {key, value} ->
-      {to_string(key), Type.render(value)}
+  defp render_properties(properties, version) do
+    Enum.into(properties, %{}, fn {key, type, constraints} ->
+      {to_string(key), Type.render(type, constraints, version)}
     end)
   end
 end
