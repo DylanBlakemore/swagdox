@@ -264,6 +264,78 @@ defmodule Swagdox.SpecTest do
              } = rendered["paths"]
     end
 
+    test "disambiguates PUT/PATCH update twins by verb" do
+      paths = [
+        %Path{
+          verb: "put",
+          path: "/things/{id}",
+          controller: MyApp.ThingController,
+          function: :update,
+          description: "Updates a Thing.",
+          request_body: []
+        },
+        %Path{
+          verb: "patch",
+          path: "/things/{id}",
+          controller: MyApp.ThingController,
+          function: :update,
+          description: "Updates a Thing.",
+          request_body: []
+        }
+      ]
+
+      rendered = Spec.render(%{spec() | paths: paths})["paths"]
+      thing = rendered["/things/{id}"]
+
+      assert thing["put"]["operationId"] == "MyApp.ThingController-update-put"
+      assert thing["patch"]["operationId"] == "MyApp.ThingController-update-patch"
+    end
+
+    test "disambiguates dual-mounted actions by verb and path" do
+      paths = [
+        %Path{
+          verb: "get",
+          path: "/benchmarks",
+          controller: MyApp.BenchmarkController,
+          function: :index,
+          description: "Lists benchmarks.",
+          request_body: []
+        },
+        %Path{
+          verb: "get",
+          path: "/web_api/querying/benchmarks",
+          controller: MyApp.BenchmarkController,
+          function: :index,
+          description: "Lists benchmarks.",
+          request_body: []
+        }
+      ]
+
+      rendered = Spec.render(%{spec() | paths: paths})["paths"]
+
+      first = rendered["/benchmarks"]["get"]["operationId"]
+      second = rendered["/web_api/querying/benchmarks"]["get"]["operationId"]
+
+      assert first == "MyApp.BenchmarkController-index-get-benchmarks"
+      assert second == "MyApp.BenchmarkController-index-get-web_api-querying-benchmarks"
+      assert first != second
+    end
+
+    test "keeps the bare operationId for a non-colliding action" do
+      path = %Path{
+        verb: "get",
+        path: "/things",
+        controller: MyApp.ThingController,
+        function: :index,
+        description: "Lists things.",
+        request_body: []
+      }
+
+      rendered = Spec.render(%{spec() | paths: [path]})["paths"]
+
+      assert rendered["/things"]["get"]["operationId"] == "MyApp.ThingController-index"
+    end
+
     test "renders the paths", %{spec: spec} do
       assert %{
                "/users" => %{
