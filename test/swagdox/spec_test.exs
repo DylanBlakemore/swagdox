@@ -118,17 +118,17 @@ defmodule Swagdox.SpecTest do
                  %Schema{
                    module: Swagdox.Order,
                    type: "object",
-                   properties: [{"item", "string"}, {"number", "integer"}],
+                   properties: [{"item", "string", []}, {"number", "integer", []}],
                    required: []
                  },
                  %Schema{
                    module: Swagdox.User,
                    type: "object",
                    properties: [
-                     {"id", "integer"},
-                     {"name", "string"},
-                     {"email", "string"},
-                     {"orders", ["OrderName"]}
+                     {"id", "integer", []},
+                     {"name", "string", []},
+                     {"email", "string", []},
+                     {"orders", ["OrderName"], []}
                    ],
                    required: []
                  }
@@ -262,6 +262,69 @@ defmodule Swagdox.SpecTest do
                  }
                }
              } = rendered["paths"]
+    end
+
+    test "threads constraints into a single body parameter schema" do
+      path = %Path{
+        verb: "post",
+        path: "/users",
+        description: "Creates Users.",
+        tags: ["users"],
+        request_body: [
+          Parameter.build({"users", "body"}, ["User"], "Users", required: true, min_items: 1)
+        ],
+        responses: []
+      }
+
+      rendered = Spec.render(%{spec() | paths: [path]})["paths"]
+
+      assert %{
+               "/users" => %{
+                 "post" => %{
+                   "requestBody" => %{
+                     "content" => %{
+                       "application/json" => %{
+                         "schema" => %{
+                           "type" => "array",
+                           "minItems" => 1,
+                           "items" => %{"$ref" => "#/components/schemas/User"}
+                         }
+                       }
+                     }
+                   }
+                 }
+               }
+             } = rendered
+    end
+
+    test "threads the OpenAPI version through to nullable rendering" do
+      path = %Path{
+        verb: "post",
+        path: "/users",
+        description: "Creates a User.",
+        tags: ["users"],
+        request_body: [
+          Parameter.build({"name", "body"}, "string", "Name", nullable: true)
+        ],
+        responses: []
+      }
+
+      spec_31 = %{spec() | paths: [path], openapi: "3.1.0"}
+      rendered = Spec.render(spec_31)["paths"]
+
+      assert %{
+               "/users" => %{
+                 "post" => %{
+                   "requestBody" => %{
+                     "content" => %{
+                       "application/json" => %{
+                         "schema" => %{"type" => ["string", "null"]}
+                       }
+                     }
+                   }
+                 }
+               }
+             } = rendered
     end
 
     test "renders the paths", %{spec: spec} do

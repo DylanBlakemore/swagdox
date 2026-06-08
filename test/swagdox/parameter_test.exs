@@ -31,6 +31,14 @@ defmodule Swagdox.ParameterTest do
                type: ["integer"]
              } = Parameter.build({"id", "body"}, ["integer"], "User IDs", required: true)
     end
+
+    test "stores constraint opts, separate from :required" do
+      param =
+        Parameter.build({"id", "body"}, ["integer"], "User IDs", required: true, min_items: 1)
+
+      assert param.required == true
+      assert param.constraints == [min_items: 1]
+    end
   end
 
   test "build/3" do
@@ -82,5 +90,19 @@ defmodule Swagdox.ParameterTest do
                }
              }
            } = Parameter.render(parameter)
+  end
+
+  test "render/2 emits constraints in the schema" do
+    parameter = %Swagdox.Parameter{
+      name: "status",
+      in: "query",
+      description: "Status",
+      required: false,
+      type: "string",
+      constraints: [enum: ["a", "b"]]
+    }
+
+    assert %{"schema" => %{"type" => "string", "enum" => ["a", "b"]}} =
+             Parameter.render(parameter, "3.0.0")
   end
 end

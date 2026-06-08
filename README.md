@@ -113,6 +113,36 @@ Parameter specifications must follow the format:
 
 where `kwargs` is a keyword-list of additional arguments used by OpenAPI specs.
 
+#### Constraints
+
+Both `@param` and `@property` accept constraint options in their trailing keyword list. They
+are rendered onto the field's schema (keys are converted from snake_case to the OpenAPI
+camelCase form):
+
+| Option                     | Applies to        | OpenAPI key                |
+| -------------------------- | ----------------- | -------------------------- |
+| `enum: [...]`              | any scalar        | `enum`                     |
+| `format: "date-time"`      | strings           | `format`                   |
+| `nullable: true`           | any scalar        | see below                  |
+| `min_length` / `max_length`| strings           | `minLength` / `maxLength`  |
+| `minimum` / `maximum`      | numbers           | `minimum` / `maximum`      |
+| `pattern: "^..$"`          | strings           | `pattern`                  |
+| `min_items` / `max_items`  | arrays            | `minItems` / `maxItems`    |
+
+```elixir
+@property status, string, "Generation status", enum: ["generating", "complete", "failed"]
+@property created_at, string, "Creation timestamp", format: "date-time"
+@param tags(body), [string], "Tags", required: true, min_items: 1
+```
+
+For array types (e.g. `[string]`), scalar constraints (`enum`, `format`, `nullable`,
+`min_length`, `max_length`, `minimum`, `maximum`, `pattern`) apply to the array **items**, while
+`min_items` / `max_items` apply to the **array** itself.
+
+Nullability is rendered according to the configured `openapi_version`: `nullable: true` becomes
+`"nullable": true` under OpenAPI 3.0, and a `"null"` type union (e.g. `"type": ["string", "null"]`)
+under 3.1.
+
 #### Responses
 
 Response are described similarly, and must follow one of these formats:

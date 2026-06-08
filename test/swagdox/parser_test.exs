@@ -252,6 +252,20 @@ defmodule Swagdox.ParserTest do
                {:property, ["user", ["User"], "User object"]}
     end
 
+    test "property with constraint options" do
+      line = "@property status, string, \"Status\", enum: [\"a\", \"b\"]"
+
+      assert Parser.parse_definition(line) ==
+               {:property, ["status", "string", "Status", [enum: ["a", "b"]]]}
+    end
+
+    test "param with a size constraint" do
+      line = "@param body(body), [User], \"Users\", required: true, min_items: 1"
+
+      assert Parser.parse_definition(line) ==
+               {:param, [{"body", "body"}, ["User"], "Users", [required: true, min_items: 1]]}
+    end
+
     test "list types" do
       line = "@response 200, [User], \"List of users\""
 

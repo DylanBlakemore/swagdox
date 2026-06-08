@@ -10,7 +10,8 @@ defmodule Swagdox.Parameter do
     :in,
     :required,
     :description,
-    :type
+    :type,
+    constraints: []
   ]
 
   @type t :: %__MODULE__{
@@ -18,7 +19,8 @@ defmodule Swagdox.Parameter do
           in: String.t(),
           required: boolean(),
           description: String.t(),
-          type: any()
+          type: any(),
+          constraints: keyword()
         }
 
   @doc """
@@ -55,7 +57,8 @@ defmodule Swagdox.Parameter do
       in: location,
       required: Keyword.get(opts, :required, false),
       description: description,
-      type: type
+      type: type,
+      constraints: Keyword.delete(opts, :required)
     }
   end
 
@@ -80,13 +83,14 @@ defmodule Swagdox.Parameter do
         }
   """
   @spec render(t()) :: map()
-  def render(parameter) do
+  @spec render(t(), String.t()) :: map()
+  def render(parameter, version \\ "3.0.0") do
     %{
       "name" => parameter.name,
       "in" => parameter.in,
       "required" => parameter.required,
       "description" => parameter.description,
-      "schema" => Type.render(parameter.type)
+      "schema" => Type.render(parameter.type, parameter.constraints, version)
     }
   end
 end
