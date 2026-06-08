@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixes
+
+- De-duplicate `operationId`s so the spec stays OpenAPI-valid when one action serves
+  multiple routes (e.g. `resources` PUT/PATCH update twins or dual-mounted controllers).
+  Colliding ids are disambiguated by verb, then by path; already-unique ids are unchanged
+  ([#2](https://github.com/DylanBlakemore/swagdox/issues/2)).
+
 ## [0.2.1] - 13 November 2025
 
 - Adds request body parameters to spec

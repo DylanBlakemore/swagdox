@@ -134,21 +134,57 @@ defmodule Swagdox.Spec do
   end
 
   defp render_paths(paths) do
+    operation_ids = assign_operation_ids(paths)
     grouped_paths = Enum.group_by(paths, & &1.path)
 
     Enum.reduce(grouped_paths, %{}, fn {path, paths}, acc ->
       acc_path =
         Enum.reduce(paths, %{}, fn path, acc_path ->
-          Map.put(acc_path, to_string(path.verb), render_path(path))
+          operation_id = Map.fetch!(operation_ids, {path.path, path.verb})
+          Map.put(acc_path, to_string(path.verb), render_path(path, operation_id))
         end)
 
       Map.put(acc, path, acc_path)
     end)
   end
 
-  defp render_path(path) do
+  # Builds a unique operationId for every path. The OpenAPI spec requires operationIds
+  # to be unique, but the base id (controller-function) collides whenever a single action
+  # serves more than one route (e.g. resources PUT/PATCH update twins, or a controller
+  # mounted under multiple scopes). Ids that are already unique are kept verbatim so we
+  # don't rename existing consumers' generated client functions.
+  defp assign_operation_ids(paths) do
+    paths
+    |> Enum.group_by(&Path.operation_id/1)
+    |> Enum.flat_map(fn
+      {base_id, [single]} -> [{{single.path, single.verb}, base_id}]
+      {base_id, group} -> disambiguate(base_id, group)
+    end)
+    |> Map.new()
+  end
+
+  # First disambiguate by verb (resolves PUT/PATCH twins). If that still collides
+  # (same verb at different paths), also append a path-derived slug.
+  defp disambiguate(base_id, group) do
+    with_verb = Enum.map(group, fn path -> {path, "#{base_id}-#{path.verb}"} end)
+    counts = Enum.frequencies(Enum.map(with_verb, fn {_path, id} -> id end))
+
+    Enum.map(with_verb, fn {path, id} ->
+      final = if counts[id] > 1, do: "#{id}-#{path_slug(path.path)}", else: id
+      {{path.path, path.verb}, final}
+    end)
+  end
+
+  defp path_slug(path) do
+    path
+    |> String.trim("/")
+    |> String.replace(["{", "}"], "")
+    |> String.replace("/", "-")
+  end
+
+  defp render_path(path, operation_id) do
     base = %{
-      "operationId" => Path.operation_id(path),
+      "operationId" => operation_id,
       "description" => path.description,
       "parameters" => render_parameters(path.parameters),
       "responses" => render_responses(path.responses),
