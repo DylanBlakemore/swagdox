@@ -5,7 +5,7 @@ defmodule Swagdox.MixProject do
     [
       app: :swagdox,
       description: "Generate OpenAPI specs from documentation comments in Elixir modules.",
-      version: "0.2.1",
+      version: "0.3.0",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
