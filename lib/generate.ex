@@ -100,15 +100,14 @@ defmodule Mix.Tasks.Swagdox.Generate do
 
   defp openapi_version(version), do: validate_openapi_version(version)
 
+  defp validate_openapi_version(<<"3.0", _rest::binary>> = version), do: version
+  defp validate_openapi_version(<<"3.1", _rest::binary>> = version), do: version
+
   defp validate_openapi_version(version) do
-    if String.starts_with?(version, "3.0") or String.starts_with?(version, "3.1") do
-      version
-    else
-      raise """
-      Invalid OpenAPI version: #{version}
-      Swagdox supports the 3.0.x and 3.1.x specifications.
-      """
-    end
+    raise """
+    Invalid OpenAPI version: #{version}
+    Swagdox supports the 3.0.x and 3.1.x specifications.
+    """
   end
 
   defp router(nil), do: project_config(:router)
