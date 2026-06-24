@@ -21,6 +21,7 @@ defmodule Mix.Tasks.Swagdox.Generate do
   * `--description` - The description of the API.
   * `--servers` - The servers of the API.
   * `--router` - The router module to use.
+  * `--openapi-version` - The OpenAPI version to target (e.g. `3.0.0` or `3.1.0`). Default is `3.0.0`.
   """
 
   use Mix.Task
@@ -50,7 +51,8 @@ defmodule Mix.Tasks.Swagdox.Generate do
           version: :string,
           description: :string,
           servers: :string,
-          router: :string
+          router: :string,
+          openapi_version: :string
         ]
       )
 
@@ -78,6 +80,7 @@ defmodule Mix.Tasks.Swagdox.Generate do
     router = router(args[:router])
     output = output(args[:output])
     format = format(args[:format])
+    openapi_version = openapi_version(args[:openapi_version])
 
     Swagdox.Config.new(
       title: title,
@@ -86,8 +89,27 @@ defmodule Mix.Tasks.Swagdox.Generate do
       servers: servers,
       router: router,
       output: output,
-      format: format
+      format: format,
+      openapi_version: openapi_version
     )
+  end
+
+  defp openapi_version(nil) do
+    :openapi_version
+    |> project_config("3.0.0")
+    |> validate_openapi_version()
+  end
+
+  defp openapi_version(version), do: validate_openapi_version(version)
+
+  defp validate_openapi_version(<<"3.0", _rest::binary>> = version), do: version
+  defp validate_openapi_version(<<"3.1", _rest::binary>> = version), do: version
+
+  defp validate_openapi_version(version) do
+    raise """
+    Invalid OpenAPI version: #{version}
+    Swagdox supports the 3.0.x and 3.1.x specifications.
+    """
   end
 
   defp router(nil), do: project_config(:router)

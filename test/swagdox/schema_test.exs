@@ -119,8 +119,28 @@ defmodule Swagdox.SchemaTest do
                    "items" => %{"$ref" => "#/components/schemas/OrderName"}
                  }
                },
-               "type" => "object"
+               "type" => "object",
+               "required" => ["email"]
              }
            }
+  end
+
+  test "render/1 emits the object-level required array" do
+    schema = %Schema{
+      type: "object",
+      module: Order,
+      properties: [{"item", "string", []}, {"number", "integer", []}],
+      required: ["item"]
+    }
+
+    assert %{"OrderName" => %{"required" => ["item"]}} = Schema.render(schema)
+  end
+
+  test "infer/1 collects required properties from the required: true constraint" do
+    schema = Schema.infer(User)
+
+    assert schema.required == ["email"]
+    # The constraint is lifted to the object level, not left on the property schema.
+    refute Schema.render(schema)["User"]["properties"]["email"][:required]
   end
 end

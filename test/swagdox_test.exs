@@ -42,7 +42,8 @@ defmodule SwagdoxTest do
               "maxItems" => 100
             }
           },
-          "type" => "object"
+          "type" => "object",
+          "required" => ["email"]
         }
       },
       "securitySchemes" => %{
@@ -211,7 +212,16 @@ defmodule SwagdoxTest do
           "responses" => %{
             "200" => %{
               "content" => %{
-                "application/json" => %{"schema" => %{"$ref" => "#/components/schemas/User"}}
+                "application/json" => %{
+                  "schema" => %{"$ref" => "#/components/schemas/User"},
+                  "example" => %{id: 1, name: "Alice"}
+                }
+              },
+              "headers" => %{
+                "X-Request-Id" => %{
+                  "description" => "Request correlation id",
+                  "schema" => %{"type" => "string"}
+                }
               },
               "description" => "User found"
             },
@@ -223,7 +233,11 @@ defmodule SwagdoxTest do
       }
     },
     "servers" => [%{"url" => "http://localhost:4000"}],
-    "tags" => []
+    "tags" => [
+      %{"name" => "creation"},
+      %{"name" => "orders"},
+      %{"name" => "users"}
+    ]
   }
 
   describe "generate_specification/1" do

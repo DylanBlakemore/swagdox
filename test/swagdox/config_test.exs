@@ -13,4 +13,14 @@ defmodule Swagdox.ConfigTest do
                router: SwagdoxWeb.Router
              )
   end
+
+  test "new/1 honors an explicit OpenAPI version" do
+    assert %Config{openapi_version: "3.1.0"} =
+             Config.new(
+               version: "0.1",
+               title: "Swagdox",
+               router: SwagdoxWeb.Router,
+               openapi_version: "3.1.0"
+             )
+  end
 end

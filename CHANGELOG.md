@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased]
+
+### Features
+
+- Lift `required: true` on a `@property` into the schema object's `required` array, instead of
+  silently dropping it.
+- Expose the target OpenAPI version through the `--openapi-version` mix task flag and the
+  `:openapi_version` project config, making the existing 3.1.x rendering reachable.
+- Emit document-level `tags` aggregated from the tags used across operations.
+- Add standalone `@example` and `@header` tags (keyed by status code) for documenting response
+  examples and response headers. Headers are modelled by a `Swagdox.Header` struct and rendered
+  through `Swagdox.Type`, so their schemas honor the configured OpenAPI version.
+
 ## [0.3.0] - 08 June 2026
 
 ### Features

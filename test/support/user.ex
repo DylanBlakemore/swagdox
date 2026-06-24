@@ -7,7 +7,7 @@ defmodule Swagdox.User do
 
     @property id, integer, "User id"
     @property name, string, "User name", nullable: true
-    @property email, string, "User email", format: "email"
+    @property email, string, "User email", format: "email", required: true
     @property orders, [OrderName], "User orders", max_items: 100
   """
   use Ecto.Schema

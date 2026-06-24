@@ -2,6 +2,7 @@ defmodule Swagdox.EndpointTest do
   use ExUnit.Case
 
   alias Swagdox.Endpoint
+  alias Swagdox.Header
   alias Swagdox.Parameter
   alias Swagdox.Response
   alias Swagdox.Security
@@ -144,6 +145,38 @@ defmodule Swagdox.EndpointTest do
                  description: "Invalid user attributes"
                }
              ] = responses
+    end
+
+    test "attaches @example and @header tags to the response with the matching status" do
+      endpoint = %Endpoint{
+        module: UserController,
+        function: :show,
+        docstring: """
+        Returns a User.
+
+        [Swagdox] API:
+          @param id(path), integer, "User ID", required: true
+
+          @response 200, User, "User found"
+          @response 404, "Not found"
+
+          @example 200, %{
+            id: 1,
+            name: "Alice"
+          }
+
+          @header 200, "X-Rate-Limit", integer, "Requests remaining"
+        """
+      }
+
+      assert [
+               %Response{
+                 status: 200,
+                 example: %{id: 1, name: "Alice"},
+                 headers: [%Header{name: "X-Rate-Limit", type: "integer"}]
+               },
+               %Response{status: 404, example: nil, headers: []}
+             ] = Endpoint.responses(endpoint)
     end
   end
 

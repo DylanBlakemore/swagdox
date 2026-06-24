@@ -3,6 +3,7 @@ defmodule Swagdox.Endpoint do
   Describes  a documented endpoint in an application controller.
   """
 
+  alias Swagdox.Header
   alias Swagdox.Parameter
   alias Swagdox.Parser
   alias Swagdox.Response
@@ -59,13 +60,41 @@ defmodule Swagdox.Endpoint do
 
   @doc """
   Returns the responses for the endpoint.
+
+  Examples (`@example`) and headers (`@header`) are documented as standalone tags
+  keyed by status code, and attached to the response with the matching status.
   """
   @spec responses(t()) :: list(Response.t())
   def responses(endpoint) do
+    examples = response_examples(endpoint)
+    headers = response_headers(endpoint)
+
     endpoint.docstring
     |> Parser.extract_responses()
     |> Enum.map(&Parser.parse_definition/1)
     |> Enum.map(&build_response/1)
+    |> Enum.map(fn response ->
+      response
+      |> Response.example(Map.get(examples, response.status))
+      |> Response.headers(Map.get(headers, response.status, []))
+    end)
+  end
+
+  defp response_examples(endpoint) do
+    endpoint.docstring
+    |> Parser.extract_example()
+    |> Enum.map(&Parser.parse_definition/1)
+    |> Map.new(fn {:example, [status, example]} -> {status, example} end)
+  end
+
+  defp response_headers(endpoint) do
+    endpoint.docstring
+    |> Parser.extract_headers()
+    |> Enum.map(&Parser.parse_definition/1)
+    |> Enum.map(fn {:header, [status, name, type, description]} ->
+      {status, Header.build(name, type, description)}
+    end)
+    |> Enum.group_by(fn {status, _header} -> status end, fn {_status, header} -> header end)
   end
 
   defp build_response({:response, [status, schema, description]}) do
