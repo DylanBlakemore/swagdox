@@ -55,7 +55,9 @@ defmodule Swagdox.Parameter do
     %__MODULE__{
       name: name,
       in: location,
-      required: Keyword.get(opts, :required, false),
+      # OpenAPI requires `required: true` for path parameters; force it regardless
+      # of what the docstring declared.
+      required: location == "path" or Keyword.get(opts, :required, false),
       description: description,
       type: type,
       constraints: Keyword.delete(opts, :required)

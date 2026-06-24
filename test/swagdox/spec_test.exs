@@ -426,7 +426,6 @@ defmodule Swagdox.SpecTest do
                  },
                  "post" => %{
                    "description" => "Creates a User.",
-                   "security" => [],
                    "tags" => ["users"],
                    "requestBody" => %{
                      "required" => true,
@@ -453,7 +452,6 @@ defmodule Swagdox.SpecTest do
                  "get" => %{
                    "tags" => ["users"],
                    "description" => "Returns a User.",
-                   "security" => [],
                    "parameters" => [
                      %{
                        "description" => "User ID",
@@ -465,15 +463,14 @@ defmodule Swagdox.SpecTest do
                        }
                      }
                    ],
-                   "responses" => %{}
+                   "responses" => %{"default" => %{"description" => "Default response"}}
                  }
                },
                "/orders" => %{
                  "get" => %{
                    "tags" => ["orders"],
-                   "security" => [],
                    "description" => "Returns a list of orders.",
-                   "responses" => %{}
+                   "responses" => %{"default" => %{"description" => "Default response"}}
                  }
                }
              } = Spec.render(spec)["paths"]

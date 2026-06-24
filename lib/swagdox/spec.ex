@@ -188,15 +188,25 @@ defmodule Swagdox.Spec do
       "description" => path.description,
       "parameters" => render_parameters(path.parameters, version),
       "responses" => render_responses(path.responses),
-      "security" => render_security(path.security),
       "tags" => path.tags
     }
 
-    case path.request_body do
-      nil -> base
-      [] -> base
-      body_params -> Map.put(base, "requestBody", render_request_body(body_params, version))
-    end
+    base
+    |> put_security(path.security)
+    |> put_request_body(path.request_body, version)
+  end
+
+  # An operation-level `security: []` is meaningful in OpenAPI - it disables any
+  # global security requirement for the operation. Only emit the key when the
+  # endpoint actually declared a security requirement.
+  defp put_security(base, []), do: base
+  defp put_security(base, security), do: Map.put(base, "security", render_security(security))
+
+  defp put_request_body(base, nil, _version), do: base
+  defp put_request_body(base, [], _version), do: base
+
+  defp put_request_body(base, body_params, version) do
+    Map.put(base, "requestBody", render_request_body(body_params, version))
   end
 
   defp render_parameters(parameters, version) do
@@ -249,7 +259,9 @@ defmodule Swagdox.Spec do
     }
   end
 
-  defp render_responses([]), do: %{}
+  # The OpenAPI Responses Object is required and must contain at least one entry,
+  # so fall back to a `default` response when the endpoint documents none.
+  defp render_responses([]), do: %{"default" => %{"description" => "Default response"}}
 
   defp render_responses(responses) do
     responses

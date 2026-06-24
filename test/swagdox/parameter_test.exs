@@ -15,11 +15,22 @@ defmodule Swagdox.ParameterTest do
 
       assert %Swagdox.Parameter{
                name: "id",
-               in: "path",
+               in: "query",
                description: "User ID",
                required: false,
                type: "integer"
+             } = Parameter.build({"id", "query"}, "integer", "User ID", required: false)
+    end
+
+    test "path parameters are always required" do
+      assert %Swagdox.Parameter{
+               name: "id",
+               in: "path",
+               required: true
              } = Parameter.build({"id", "path"}, "integer", "User ID", required: false)
+
+      assert %Swagdox.Parameter{in: "path", required: true} =
+               Parameter.build({"id", "path"}, "integer", "User ID")
     end
 
     test "arrays" do
