@@ -74,11 +74,9 @@ defmodule Swagdox.Endpoint do
     |> Enum.map(&Parser.parse_definition/1)
     |> Enum.map(&build_response/1)
     |> Enum.map(fn response ->
-      %Response{
-        response
-        | example: Map.get(examples, response.status),
-          headers: Map.get(headers, response.status, [])
-      }
+      response
+      |> Response.example(Map.get(examples, response.status))
+      |> Response.headers(Map.get(headers, response.status, []))
     end)
   end
 

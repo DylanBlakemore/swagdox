@@ -40,6 +40,18 @@ defmodule Swagdox.Response do
     build(status, nil, description, [])
   end
 
+  @doc """
+  Attaches a documented example to the response.
+  """
+  @spec example(t(), any()) :: t()
+  def example(response, example), do: %__MODULE__{response | example: example}
+
+  @doc """
+  Attaches the documented response headers to the response.
+  """
+  @spec headers(t(), list(Header.t())) :: t()
+  def headers(response, headers), do: %__MODULE__{response | headers: headers}
+
   defp build_content(nil), do: nil
 
   # Render the schema the same way parameters and request bodies do, so primitive
