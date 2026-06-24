@@ -42,7 +42,8 @@ defmodule SwagdoxTest do
               "maxItems" => 100
             }
           },
-          "type" => "object"
+          "type" => "object",
+          "required" => ["email"]
         }
       },
       "securitySchemes" => %{
@@ -223,7 +224,11 @@ defmodule SwagdoxTest do
       }
     },
     "servers" => [%{"url" => "http://localhost:4000"}],
-    "tags" => []
+    "tags" => [
+      %{"name" => "creation"},
+      %{"name" => "orders"},
+      %{"name" => "users"}
+    ]
   }
 
   describe "generate_specification/1" do

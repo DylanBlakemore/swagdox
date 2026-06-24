@@ -41,14 +41,15 @@ defmodule Swagdox.Response do
 
   # Render the schema the same way parameters and request bodies do, so primitive
   # types (`string`, `integer`, ...) and arrays of primitives produce a real inline
-  # schema instead of a dangling `$ref` to a non-existent component.
-  defp build_content(schema, _options) do
-    [
-      %{
-        media_type: "application/json",
-        schema: Type.render(schema)
-      }
-    ]
+  # schema instead of a dangling `$ref` to a non-existent component. A documented
+  # `example:` is threaded onto the media type object.
+  defp build_content(schema, options) do
+    content = %{media_type: "application/json", schema: Type.render(schema)}
+
+    case Keyword.get(options, :example) do
+      nil -> [content]
+      example -> [Map.put(content, :example, example)]
+    end
   end
 
   @doc """
@@ -90,13 +91,33 @@ defmodule Swagdox.Response do
 
   defp render_response(response) do
     %{description: description, content: content} = response
-    rendered = %{"description" => description}
 
-    case content do
+    %{"description" => description}
+    |> put_content(content)
+    |> put_headers(response.options)
+  end
+
+  defp put_content(rendered, nil), do: rendered
+  defp put_content(rendered, content), do: Map.put(rendered, "content", render_content(content))
+
+  # An optional `headers:` keyword on `@response` is rendered as the response-level
+  # `headers` map. Values are passed through as OpenAPI Header Objects, with map keys
+  # stringified so they serialize to valid JSON.
+  defp put_headers(rendered, options) when is_list(options) do
+    case Keyword.get(options, :headers) do
       nil -> rendered
-      _ -> Map.put(rendered, "content", render_content(content))
+      headers -> Map.put(rendered, "headers", deep_stringify(headers))
     end
   end
+
+  defp put_headers(rendered, _options), do: rendered
+
+  defp deep_stringify(%{} = map) do
+    Map.new(map, fn {key, value} -> {to_string(key), deep_stringify(value)} end)
+  end
+
+  defp deep_stringify(list) when is_list(list), do: Enum.map(list, &deep_stringify/1)
+  defp deep_stringify(value), do: value
 
   defp render_content(content) do
     Enum.reduce(content, %{}, fn value, acc ->

@@ -22,6 +22,7 @@ The specification file can be generated in yaml or json format using the `swagdo
 - `--description` - The description of the API.
 - `--servers` - The servers of the API.
 - `--router` - The router module to use.
+- `--openapi-version` - The OpenAPI version to target (`3.0.x` or `3.1.x`). Default is `3.0.0`.
 
 All options can alternatively be specified using standard shorthand syntax (`-o`, `-f` etc.)
 
@@ -38,7 +39,8 @@ def project do
       output: "./openapi.yml",
       title: "My App",
       version: "1.0",
-      description: "A longer description"
+      description: "A longer description",
+      openapi_version: "3.1.0"
     ]
   ]
 end
@@ -143,6 +145,15 @@ Nullability is rendered according to the configured `openapi_version`: `nullable
 `"nullable": true` under OpenAPI 3.0, and a `"null"` type union (e.g. `"type": ["string", "null"]`)
 under 3.1.
 
+`required: true` is handled specially. On a `@param` it sets the parameter's `required` flag; on a
+`@property` it adds the field to the schema object's `required` array rather than emitting a
+per-property key:
+
+```elixir
+@property email, string, "User email", required: true
+# => the "User" schema gains "required": ["email"]
+```
+
 #### Responses
 
 Response are described similarly, and must follow one of these formats:
@@ -151,6 +162,14 @@ Response are described similarly, and must follow one of these formats:
 @response code, type, description
 
 @response code, description
+```
+
+A trailing keyword list can attach an `example` (rendered onto the media type) and `headers`
+(rendered as the response's `headers` object):
+
+```elixir
+@response 200, User, "User found", example: %{id: 1, name: "Alice"}
+@response 200, User, "User found", headers: %{"X-Rate-Limit" => %{description: "Requests left", schema: %{type: "integer"}}}
 ```
 
 #### Types

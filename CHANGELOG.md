@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased]
+
+### Features
+
+- Lift `required: true` on a `@property` into the schema object's `required` array, instead of
+  silently dropping it.
+- Expose the target OpenAPI version through the `--openapi-version` mix task flag and the
+  `:openapi_version` project config, making the existing 3.1.x rendering reachable.
+- Emit document-level `tags` aggregated from the tags used across operations.
+- Render `example` and `headers` options documented on a `@response` (previously stored but dropped).
+
 ## [0.3.0] - 08 June 2026
 
 ### Features

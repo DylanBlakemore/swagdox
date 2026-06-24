@@ -12,19 +12,34 @@ defmodule Swagdox.Schema do
           type: String.t(),
           module: module(),
           properties: list(property()),
-          required: list(atom()),
+          required: list(String.t()),
           description: String.t()
         }
 
   @spec infer(module()) :: t()
   def infer(module) do
+    props = properties(module)
+
     %__MODULE__{
       module: module,
       type: "object",
-      properties: properties(module),
+      properties: props,
+      required: required_properties(props),
       description: description(module),
       example: example(module)
     }
+  end
+
+  # A property documented with `required: true` is collected into the object's
+  # `required` list (per the OpenAPI Schema Object), rather than being emitted as
+  # a per-property constraint - `Type.render` strips `:required` from the property
+  # schema itself.
+  defp required_properties(properties) do
+    properties
+    |> Enum.filter(fn {_name, _type, constraints} ->
+      Keyword.get(constraints, :required, false)
+    end)
+    |> Enum.map(fn {name, _type, _constraints} -> to_string(name) end)
   end
 
   @spec example(module()) :: any()
@@ -99,9 +114,16 @@ defmodule Swagdox.Schema do
         "type" => schema.type,
         "properties" => render_properties(schema.properties, version)
       }
+      |> render_required(schema)
       |> render_example(schema)
 
     %{name => rendered}
+  end
+
+  defp render_required(rendered, %{required: []}), do: rendered
+
+  defp render_required(rendered, %{required: required}) do
+    Map.put(rendered, "required", required)
   end
 
   defp render_example(rendered, %{example: nil}), do: rendered

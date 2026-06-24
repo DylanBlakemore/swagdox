@@ -182,5 +182,41 @@ defmodule Swagdox.ResponseTest do
                }
              }
     end
+
+    test "renders a documented example on the media type" do
+      response = Response.build(200, "User", "OK", example: %{id: 1, name: "Alice"})
+
+      assert Response.render(response) == %{
+               "200" => %{
+                 "description" => "OK",
+                 "content" => %{
+                   "application/json" => %{
+                     "schema" => %{"$ref" => "#/components/schemas/User"},
+                     "example" => %{id: 1, name: "Alice"}
+                   }
+                 }
+               }
+             }
+    end
+
+    test "renders documented response headers" do
+      response =
+        Response.build(200, "User", "OK",
+          headers: %{
+            "X-Rate-Limit" => %{description: "Requests left", schema: %{type: "integer"}}
+          }
+        )
+
+      assert %{
+               "200" => %{
+                 "headers" => %{
+                   "X-Rate-Limit" => %{
+                     "description" => "Requests left",
+                     "schema" => %{"type" => "integer"}
+                   }
+                 }
+               }
+             } = Response.render(response)
+    end
   end
 end

@@ -97,7 +97,7 @@ defmodule Swagdox.Spec do
       "info" => render_info(spec.info),
       "servers" => render_servers(spec.servers),
       "paths" => render_paths(spec.paths, spec.openapi),
-      "tags" => [],
+      "tags" => render_tags(spec.paths),
       "components" => %{
         "schemas" => render_schemas(spec.schemas, spec.openapi),
         "securitySchemes" => render_security_schemes(spec.security)
@@ -271,5 +271,16 @@ defmodule Swagdox.Spec do
 
   defp render_security(security) do
     Enum.map(security, &Security.render/1)
+  end
+
+  # Surface every tag used by an operation as a document-level Tag Object. Names are
+  # deduplicated and sorted for stable output; descriptions aren't available from the
+  # operation-level `@tags` DSL, so only `name` is emitted.
+  defp render_tags(paths) do
+    paths
+    |> Enum.flat_map(fn path -> path.tags || [] end)
+    |> Enum.uniq()
+    |> Enum.sort()
+    |> Enum.map(fn tag -> %{"name" => tag} end)
   end
 end

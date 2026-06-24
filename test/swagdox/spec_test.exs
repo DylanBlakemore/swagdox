@@ -131,10 +131,10 @@ defmodule Swagdox.SpecTest do
                    properties: [
                      {"id", "integer", []},
                      {"name", "string", [nullable: true]},
-                     {"email", "string", [format: "email"]},
+                     {"email", "string", [format: "email", required: true]},
                      {"orders", ["OrderName"], [max_items: 100]}
                    ],
-                   required: []
+                   required: ["email"]
                  }
                ]
              } = Spec.generate_schemas(spec())
@@ -201,6 +201,13 @@ defmodule Swagdox.SpecTest do
                  }
                }
              } = spec |> Spec.generate_security_schemes() |> Spec.render()
+    end
+
+    test "renders document-level tags aggregated from operations", %{spec: spec} do
+      assert Spec.render(spec)["tags"] == [
+               %{"name" => "orders"},
+               %{"name" => "users"}
+             ]
     end
 
     test "renders the schemas", %{spec: spec} do
