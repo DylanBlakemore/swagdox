@@ -79,6 +79,11 @@ defmodule Swagdox.Parser do
     extract_elements(docstring, "@example")
   end
 
+  @spec extract_headers(String.t()) :: list(String.t())
+  def extract_headers(docstring) do
+    extract_elements(docstring, "@header")
+  end
+
   defp extract_elements(docstring, prefix) do
     regex_pattern = ~r/(@[^@]*)/
 

@@ -9,6 +9,10 @@ defmodule SwagdoxWeb.UserController do
     @response 403, "User not authorized"
     @response 404, "User not found"
 
+    @example 200, %{id: 1, name: "Alice"}
+
+    @header 200, "X-Request-Id", string, "Request correlation id"
+
     @security BasicAuth, [read]
 
     @tags users

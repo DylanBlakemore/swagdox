@@ -212,7 +212,16 @@ defmodule SwagdoxTest do
           "responses" => %{
             "200" => %{
               "content" => %{
-                "application/json" => %{"schema" => %{"$ref" => "#/components/schemas/User"}}
+                "application/json" => %{
+                  "schema" => %{"$ref" => "#/components/schemas/User"},
+                  "example" => %{id: 1, name: "Alice"}
+                }
+              },
+              "headers" => %{
+                "X-Request-Id" => %{
+                  "description" => "Request correlation id",
+                  "schema" => %{"type" => "string"}
+                }
               },
               "description" => "User found"
             },

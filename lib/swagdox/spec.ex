@@ -187,7 +187,7 @@ defmodule Swagdox.Spec do
       "operationId" => operation_id,
       "description" => path.description,
       "parameters" => render_parameters(path.parameters, version),
-      "responses" => render_responses(path.responses),
+      "responses" => render_responses(path.responses, version),
       "tags" => path.tags
     }
 
@@ -261,11 +261,11 @@ defmodule Swagdox.Spec do
 
   # The OpenAPI Responses Object is required and must contain at least one entry,
   # so fall back to a `default` response when the endpoint documents none.
-  defp render_responses([]), do: %{"default" => %{"description" => "Default response"}}
+  defp render_responses([], _version), do: %{"default" => %{"description" => "Default response"}}
 
-  defp render_responses(responses) do
+  defp render_responses(responses, version) do
     responses
-    |> Enum.map(&Response.render/1)
+    |> Enum.map(&Response.render(&1, version))
     |> Enum.reduce(&Map.merge/2)
   end
 

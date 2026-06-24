@@ -95,7 +95,9 @@ defmodule Mix.Tasks.Swagdox.Generate do
   end
 
   defp openapi_version(nil) do
-    validate_openapi_version(project_config(:openapi_version, "3.0.0"))
+    :openapi_version
+    |> project_config("3.0.0")
+    |> validate_openapi_version()
   end
 
   defp openapi_version(version), do: validate_openapi_version(version)

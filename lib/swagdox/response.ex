@@ -2,14 +2,17 @@ defmodule Swagdox.Response do
   @moduledoc """
   Describes a response in an OpenAPI specification.
   """
+  alias Swagdox.Header
   alias Swagdox.Type
 
-  defstruct [:status, :description, :content, :options]
+  defstruct [:status, :description, :content, :options, example: nil, headers: []]
 
   @type t :: %__MODULE__{
           status: integer(),
           description: String.t(),
-          content: map() | nil
+          content: list(map()) | nil,
+          example: any(),
+          headers: list(Header.t())
         }
 
   @spec build(integer(), String.t() | nil, String.t(), keyword()) :: t()
@@ -17,7 +20,7 @@ defmodule Swagdox.Response do
     %__MODULE__{
       status: status,
       description: description,
-      content: build_content(schema, options),
+      content: build_content(schema),
       options: options
     }
   end
@@ -37,19 +40,13 @@ defmodule Swagdox.Response do
     build(status, nil, description, [])
   end
 
-  defp build_content(nil, _options), do: nil
+  defp build_content(nil), do: nil
 
   # Render the schema the same way parameters and request bodies do, so primitive
   # types (`string`, `integer`, ...) and arrays of primitives produce a real inline
-  # schema instead of a dangling `$ref` to a non-existent component. A documented
-  # `example:` is threaded onto the media type object.
-  defp build_content(schema, options) do
-    content = %{media_type: "application/json", schema: Type.render(schema)}
-
-    case Keyword.get(options, :example) do
-      nil -> [content]
-      example -> [Map.put(content, :example, example)]
-    end
+  # schema instead of a dangling `$ref` to a non-existent component.
+  defp build_content(schema) do
+    [%{media_type: "application/json", schema: Type.render(schema)}]
   end
 
   @doc """
@@ -81,54 +78,45 @@ defmodule Swagdox.Response do
       }
   """
   @spec render(t()) :: map()
-  def render(response) do
+  @spec render(t(), String.t()) :: map()
+  def render(response, version \\ "3.0.0") do
     status = Integer.to_string(response.status)
 
-    %{
-      status => render_response(response)
-    }
+    %{status => render_response(response, version)}
   end
 
-  defp render_response(response) do
-    %{description: description, content: content} = response
-
-    %{"description" => description}
-    |> put_content(content)
-    |> put_headers(response.options)
+  defp render_response(response, version) do
+    %{"description" => response.description}
+    |> put_content(response.content, response.example)
+    |> put_headers(response.headers, version)
   end
 
-  defp put_content(rendered, nil), do: rendered
-  defp put_content(rendered, content), do: Map.put(rendered, "content", render_content(content))
+  # A documented `@example` is attached to the media type. When a response carries an
+  # example but no schema, an `application/json` media type is still emitted so the
+  # example has somewhere valid to live.
+  defp put_content(rendered, nil, nil), do: rendered
 
-  # An optional `headers:` keyword on `@response` is rendered as the response-level
-  # `headers` map. Values are passed through as OpenAPI Header Objects, with map keys
-  # stringified so they serialize to valid JSON.
-  defp put_headers(rendered, options) when is_list(options) do
-    case Keyword.get(options, :headers) do
-      nil -> rendered
-      headers -> Map.put(rendered, "headers", deep_stringify(headers))
-    end
+  defp put_content(rendered, nil, example) do
+    Map.put(rendered, "content", %{"application/json" => %{"example" => example}})
   end
 
-  defp put_headers(rendered, _options), do: rendered
-
-  defp deep_stringify(%{} = map) do
-    Map.new(map, fn {key, value} -> {to_string(key), deep_stringify(value)} end)
+  defp put_content(rendered, content, example) do
+    Map.put(rendered, "content", render_content(content, example))
   end
 
-  defp deep_stringify(list) when is_list(list), do: Enum.map(list, &deep_stringify/1)
-  defp deep_stringify(value), do: value
-
-  defp render_content(content) do
+  defp render_content(content, example) do
     Enum.reduce(content, %{}, fn value, acc ->
-      rendered =
-        %{"schema" => value.schema}
-        |> put_example(value[:example])
-
+      rendered = put_example(%{"schema" => value.schema}, example)
       Map.put(acc, value.media_type, rendered)
     end)
   end
 
-  defp put_example(content, nil), do: content
-  defp put_example(content, example), do: Map.put(content, "example", example)
+  defp put_example(media_type, nil), do: media_type
+  defp put_example(media_type, example), do: Map.put(media_type, "example", example)
+
+  defp put_headers(rendered, [], _version), do: rendered
+
+  defp put_headers(rendered, headers, version) do
+    Map.put(rendered, "headers", Map.new(headers, &Header.render(&1, version)))
+  end
 end

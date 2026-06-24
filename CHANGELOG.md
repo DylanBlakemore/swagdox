@@ -9,7 +9,9 @@
 - Expose the target OpenAPI version through the `--openapi-version` mix task flag and the
   `:openapi_version` project config, making the existing 3.1.x rendering reachable.
 - Emit document-level `tags` aggregated from the tags used across operations.
-- Render `example` and `headers` options documented on a `@response` (previously stored but dropped).
+- Add standalone `@example` and `@header` tags (keyed by status code) for documenting response
+  examples and response headers. Headers are modelled by a `Swagdox.Header` struct and rendered
+  through `Swagdox.Type`, so their schemas honor the configured OpenAPI version.
 
 ## [0.3.0] - 08 June 2026
 

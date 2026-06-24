@@ -164,13 +164,28 @@ Response are described similarly, and must follow one of these formats:
 @response code, description
 ```
 
-A trailing keyword list can attach an `example` (rendered onto the media type) and `headers`
-(rendered as the response's `headers` object):
+##### Examples and headers
+
+Examples and response headers are documented with standalone `@example` and `@header` tags,
+each keyed by the status code of the response they describe. This keeps the `@response` lines
+uncluttered and lets examples span multiple lines:
 
 ```elixir
-@response 200, User, "User found", example: %{id: 1, name: "Alice"}
-@response 200, User, "User found", headers: %{"X-Rate-Limit" => %{description: "Requests left", schema: %{type: "integer"}}}
+@response 200, User, "User found"
+@response 404, "Not found"
+
+@example 200, %{
+  id: 1,
+  name: "Alice"
+}
+
+@header 200, "X-Rate-Limit", integer, "Requests remaining"
 ```
+
+`@example <status>, <value>` attaches the (arbitrary) value to the matching response's media
+type. `@header <status>, <name>, <type>, <description>` adds a header to the response; the
+header's schema is built from `<type>` through the same type/constraint rendering as parameters,
+so it honors the configured `openapi_version`.
 
 #### Types
 
