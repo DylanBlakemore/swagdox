@@ -17,7 +17,7 @@ defmodule Swagdox.ResponseTest do
                %{
                  media_type: "application/json",
                  schema: %{
-                   ref: "#/components/schemas/User"
+                   "$ref" => "#/components/schemas/User"
                  }
                }
              ]
@@ -38,7 +38,7 @@ defmodule Swagdox.ResponseTest do
                %{
                  media_type: "application/json",
                  schema: %{
-                   ref: "#/components/schemas/User"
+                   "$ref" => "#/components/schemas/User"
                  }
                }
              ]
@@ -57,9 +57,20 @@ defmodule Swagdox.ResponseTest do
                %{
                  media_type: "application/json",
                  schema: %{
-                   type: "array",
-                   ref: "#/components/schemas/User"
+                   "type" => "array",
+                   "items" => %{"$ref" => "#/components/schemas/User"}
                  }
+               }
+             ]
+    end
+
+    test "builds a response with a primitive type" do
+      response = Response.build(200, "string", "OK")
+
+      assert response.content == [
+               %{
+                 media_type: "application/json",
+                 schema: %{"type" => "string"}
                }
              ]
     end
@@ -103,7 +114,7 @@ defmodule Swagdox.ResponseTest do
           %{
             media_type: "application/json",
             schema: %{
-              ref: "#/components/schemas/User"
+              "$ref" => "#/components/schemas/User"
             },
             example: nil
           }
@@ -132,8 +143,8 @@ defmodule Swagdox.ResponseTest do
           %{
             media_type: "application/json",
             schema: %{
-              type: "array",
-              ref: "#/components/schemas/User"
+              "type" => "array",
+              "items" => %{"$ref" => "#/components/schemas/User"}
             },
             example: nil
           }
@@ -157,28 +168,19 @@ defmodule Swagdox.ResponseTest do
              }
     end
 
-    test "raises an error if the schema is not a reference" do
-      response = %Response{
-        status: 200,
-        description: "OK",
-        content: [
-          %{
-            media_type: "application/json",
-            schema: %{
-              type: "object",
-              properties: %{
-                foo: %{
-                  type: "string"
-                }
-              }
-            }
-          }
-        ]
-      }
+    test "renders a primitive schema inline" do
+      response = Response.build(200, "string", "OK")
 
-      assert_raise RuntimeError, fn ->
-        Response.render(response)
-      end
+      assert Response.render(response) == %{
+               "200" => %{
+                 "description" => "OK",
+                 "content" => %{
+                   "application/json" => %{
+                     "schema" => %{"type" => "string"}
+                   }
+                 }
+               }
+             }
     end
   end
 end

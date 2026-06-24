@@ -2,7 +2,7 @@ defmodule Swagdox.Response do
   @moduledoc """
   Describes a response in an OpenAPI specification.
   """
-  alias Swagdox.Schema
+  alias Swagdox.Type
 
   defstruct [:status, :description, :content, :options]
 
@@ -39,25 +39,14 @@ defmodule Swagdox.Response do
 
   defp build_content(nil, _options), do: nil
 
-  defp build_content([schema], _options) do
-    [
-      %{
-        media_type: "application/json",
-        schema: %{
-          type: "array",
-          ref: Schema.reference(schema)
-        }
-      }
-    ]
-  end
-
+  # Render the schema the same way parameters and request bodies do, so primitive
+  # types (`string`, `integer`, ...) and arrays of primitives produce a real inline
+  # schema instead of a dangling `$ref` to a non-existent component.
   defp build_content(schema, _options) do
     [
       %{
         media_type: "application/json",
-        schema: %{
-          ref: Schema.reference(schema)
-        }
+        schema: Type.render(schema)
       }
     ]
   end
@@ -112,25 +101,13 @@ defmodule Swagdox.Response do
   defp render_content(content) do
     Enum.reduce(content, %{}, fn value, acc ->
       rendered =
-        %{}
-        |> put_schema(value.schema)
+        %{"schema" => value.schema}
         |> put_example(value[:example])
 
       Map.put(acc, value.media_type, rendered)
     end)
   end
 
-  defp put_schema(content, %{type: "array", ref: ref}) do
-    Map.put(content, "schema", %{"type" => "array", "items" => %{"$ref" => ref}})
-  end
-
-  defp put_schema(content, %{ref: ref}) do
-    Map.put(content, "schema", %{"$ref" => ref})
-  end
-
-  defp put_schema(_content, _schema) do
-    raise RuntimeError, "Only reference schemas supported for responses at this stage"
-  end
-
   defp put_example(content, nil), do: content
+  defp put_example(content, example), do: Map.put(content, "example", example)
 end
