@@ -79,6 +79,20 @@ defmodule Swagdox.Parser do
     extract_elements(docstring, "@example")
   end
 
+  @doc """
+  Extracts the `@type` tag from a docstring. A schema that declares a type expression
+  (e.g. `@type Cat | Dog`) is described by that type rather than by its properties.
+  """
+  @spec extract_type(String.t()) :: list(String.t())
+  def extract_type(docstring) do
+    extract_elements(docstring, "@type")
+  end
+
+  @spec extract_discriminator(String.t()) :: list(String.t())
+  def extract_discriminator(docstring) do
+    extract_elements(docstring, "@discriminator")
+  end
+
   @spec extract_headers(String.t()) :: list(String.t())
   def extract_headers(docstring) do
     extract_elements(docstring, "@header")
@@ -161,6 +175,19 @@ defmodule Swagdox.Parser do
     to_string(value)
   end
 
+  # A union in the type position - `Cat | Dog` - parses to a `one_of` composition,
+  # which `Swagdox.Type` renders as `oneOf`. `|` is right-associative, so a union of
+  # three or more types arrives nested and is flattened into a single composition.
+  defp parse_node({:|, _meta, [_left, _right]} = union) do
+    {"one_of", flatten_union(union)}
+  end
+
+  # The other compositions have no operator form: `any_of(Cat, string)`, `all_of(Base, Own)`.
+  defp parse_node({composition, _meta, types})
+       when composition in [:any_of, :all_of, :one_of] and is_list(types) do
+    {to_string(composition), Enum.map(types, &parse_node/1)}
+  end
+
   defp parse_node({name, _, [{location, _, nil}]}) do
     {to_string(name), to_string(location)}
   end
@@ -186,4 +213,10 @@ defmodule Swagdox.Parser do
   defp parse_node(node) when is_list(node) do
     Enum.map(node, &parse_node/1)
   end
+
+  defp flatten_union({:|, _meta, [left, right]}) do
+    [parse_node(left) | flatten_union(right)]
+  end
+
+  defp flatten_union(node), do: [parse_node(node)]
 end

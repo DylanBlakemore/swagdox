@@ -30,6 +30,20 @@ defmodule SwagdoxTest do
           "type" => "object",
           "example" => %{item: "item", number: 1}
         },
+        "SearchResult" => %{
+          "description" => "A single search result",
+          "oneOf" => [
+            %{"$ref" => "#/components/schemas/User"},
+            %{"$ref" => "#/components/schemas/OrderName"}
+          ],
+          "discriminator" => %{
+            "propertyName" => "kind",
+            "mapping" => %{
+              "user" => "#/components/schemas/User",
+              "order" => "#/components/schemas/OrderName"
+            }
+          }
+        },
         "User" => %{
           "description" => "A user of the application",
           "properties" => %{

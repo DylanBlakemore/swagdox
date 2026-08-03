@@ -15,12 +15,7 @@ defmodule Swagdox.ResponseTest do
              } = response
 
       assert response.content == [
-               %{
-                 media_type: "application/json",
-                 schema: %{
-                   "$ref" => "#/components/schemas/User"
-                 }
-               }
+               %{media_type: "application/json", type: "User", constraints: []}
              ]
     end
   end
@@ -36,12 +31,7 @@ defmodule Swagdox.ResponseTest do
              } = response
 
       assert response.content == [
-               %{
-                 media_type: "application/json",
-                 schema: %{
-                   "$ref" => "#/components/schemas/User"
-                 }
-               }
+               %{media_type: "application/json", type: "User", constraints: []}
              ]
     end
 
@@ -55,13 +45,7 @@ defmodule Swagdox.ResponseTest do
              } = response
 
       assert response.content == [
-               %{
-                 media_type: "application/json",
-                 schema: %{
-                   "type" => "array",
-                   "items" => %{"$ref" => "#/components/schemas/User"}
-                 }
-               }
+               %{media_type: "application/json", type: ["User"], constraints: []}
              ]
     end
 
@@ -69,10 +53,7 @@ defmodule Swagdox.ResponseTest do
       response = Response.build(200, "string", "OK")
 
       assert response.content == [
-               %{
-                 media_type: "application/json",
-                 schema: %{"type" => "string"}
-               }
+               %{media_type: "application/json", type: "string", constraints: []}
              ]
     end
 
@@ -111,15 +92,7 @@ defmodule Swagdox.ResponseTest do
       response = %Response{
         status: 200,
         description: "OK",
-        content: [
-          %{
-            media_type: "application/json",
-            schema: %{
-              "$ref" => "#/components/schemas/User"
-            },
-            example: nil
-          }
-        ]
+        content: [%{media_type: "application/json", type: "User", constraints: []}]
       }
 
       assert Response.render(response) == %{
@@ -140,16 +113,7 @@ defmodule Swagdox.ResponseTest do
       response = %Response{
         status: 200,
         description: "OK",
-        content: [
-          %{
-            media_type: "application/json",
-            schema: %{
-              "type" => "array",
-              "items" => %{"$ref" => "#/components/schemas/User"}
-            },
-            example: nil
-          }
-        ]
+        content: [%{media_type: "application/json", type: ["User"], constraints: []}]
       }
 
       assert Response.render(response) == %{
@@ -167,6 +131,23 @@ defmodule Swagdox.ResponseTest do
                  }
                }
              }
+    end
+
+    test "schema constraints are rendered per the OpenAPI version" do
+      response = Response.build(200, "string", "OK", nullable: true, foo: "bar")
+
+      # Options that describe the response, not its schema, are left alone.
+      assert response.options == [foo: "bar"]
+
+      assert %{"200" => %{"content" => %{"application/json" => %{"schema" => schema}}}} =
+               Response.render(response, "3.0.0")
+
+      assert schema == %{"type" => "string", "nullable" => true}
+
+      assert %{"200" => %{"content" => %{"application/json" => %{"schema" => schema}}}} =
+               Response.render(response, "3.1.0")
+
+      assert schema == %{"type" => ["string", "null"]}
     end
 
     test "renders a primitive schema inline" do
