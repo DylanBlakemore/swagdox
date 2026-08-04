@@ -61,14 +61,12 @@ defmodule Swagdox.Type do
   @spec render(variable(), keyword(), String.t()) :: map()
   def render(type, constraints \\ [], version \\ @default_version)
 
+  def render({composition, []}, _constraints, _version) do
+    raise ArgumentError, "#{composition} requires at least one type"
+  end
+
   def render({composition, types}, constraints, version) when is_list(types) do
-    key = composition_key(composition)
-
-    if types == [] do
-      raise ArgumentError, "#{composition} requires at least one type"
-    end
-
-    %{key => Enum.map(types, &render(&1, [], version))}
+    %{composition_key(composition) => Enum.map(types, &render(&1, [], version))}
     |> apply_constraints(constraints, version)
   end
 
