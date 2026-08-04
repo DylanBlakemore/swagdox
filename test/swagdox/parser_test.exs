@@ -174,6 +174,38 @@ defmodule Swagdox.ParserTest do
     end
   end
 
+  describe "extract_type/1 and extract_discriminator/1" do
+    test "extracts the type and discriminator from a docstring" do
+      docstring = """
+      A pet.
+
+      [Swagdox] Schema:
+        @name Pet
+        @type Cat | Dog
+        @discriminator pet_type, %{cat: Cat, dog: Dog}
+      """
+
+      assert Parser.extract_type(docstring) == ["@type Cat | Dog"]
+
+      assert Parser.extract_discriminator(docstring) == [
+               "@discriminator pet_type, %{cat: Cat, dog: Dog}"
+             ]
+    end
+
+    test "returns an empty list when the schema documents neither" do
+      docstring = """
+      A pet.
+
+      [Swagdox] Schema:
+        @name Pet
+        @property name, string, "Pet name"
+      """
+
+      assert Parser.extract_type(docstring) == []
+      assert Parser.extract_discriminator(docstring) == []
+    end
+  end
+
   describe "extract_module_doc/1" do
     test "extracts the module docstring from a module" do
       module = Swagdox.User
@@ -271,6 +303,64 @@ defmodule Swagdox.ParserTest do
 
       assert Parser.parse_definition(line) ==
                {:response, [200, ["User"], "List of users"]}
+    end
+
+    test "union types" do
+      line = "@response 200, Cat | Dog, \"A pet\""
+
+      assert Parser.parse_definition(line) ==
+               {:response, [200, {"one_of", ["Cat", "Dog"]}, "A pet"]}
+
+      line = "@property pet, Cat | string, \"A pet\""
+
+      assert Parser.parse_definition(line) ==
+               {:property, ["pet", {"one_of", ["Cat", "string"]}, "A pet"]}
+    end
+
+    test "unions of three or more types flatten into a single oneOf" do
+      line = "@response 200, Cat | Dog | Bird, \"A pet\""
+
+      assert Parser.parse_definition(line) ==
+               {:response, [200, {"one_of", ["Cat", "Dog", "Bird"]}, "A pet"]}
+    end
+
+    test "any_of and all_of compositions" do
+      line = "@property pet, any_of(Cat, string), \"A pet\""
+
+      assert Parser.parse_definition(line) ==
+               {:property, ["pet", {"any_of", ["Cat", "string"]}, "A pet"]}
+
+      line = "@property pet, all_of(Base, Extra), \"A pet\""
+
+      assert Parser.parse_definition(line) ==
+               {:property, ["pet", {"all_of", ["Base", "Extra"]}, "A pet"]}
+    end
+
+    test "union types with a discriminator" do
+      line = "@response 200, Cat | Dog, \"A pet\", discriminator: pet_type"
+
+      assert Parser.parse_definition(line) ==
+               {:response,
+                [200, {"one_of", ["Cat", "Dog"]}, "A pet", [discriminator: "pet_type"]]}
+    end
+
+    test "arrays of union types" do
+      line = "@response 200, [Cat | Dog], \"Pets\""
+
+      assert Parser.parse_definition(line) ==
+               {:response, [200, [{"one_of", ["Cat", "Dog"]}], "Pets"]}
+    end
+
+    test "schema-level type and discriminator" do
+      assert Parser.parse_definition("@type Cat | Dog") == {:type, [{"one_of", ["Cat", "Dog"]}]}
+
+      assert Parser.parse_definition("@type all_of(Cat, Dog)") ==
+               {:type, [{"all_of", ["Cat", "Dog"]}]}
+
+      assert Parser.parse_definition("@discriminator pet_type") == {:discriminator, ["pet_type"]}
+
+      assert Parser.parse_definition("@discriminator pet_type, %{cat: Cat}") ==
+               {:discriminator, ["pet_type", %{cat: "Cat"}]}
     end
 
     test "response" do

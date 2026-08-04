@@ -7,20 +7,26 @@ defmodule Swagdox.Response do
 
   defstruct [:status, :description, :content, :options, example: nil, headers: []]
 
+  @type content :: %{media_type: String.t(), type: any(), constraints: keyword()}
   @type t :: %__MODULE__{
           status: integer(),
           description: String.t(),
-          content: list(map()) | nil,
+          content: list(content()) | nil,
           example: any(),
           headers: list(Header.t())
         }
 
   @spec build(integer(), String.t() | nil, String.t(), keyword()) :: t()
   def build(status, schema, description, options) do
+    # A response's trailing options mix schema constraints (`nullable`, `discriminator`,
+    # ...) with options that describe the response itself, so only the former are
+    # handed to the schema.
+    {constraints, options} = Type.split_constraints(options)
+
     %__MODULE__{
       status: status,
       description: description,
-      content: build_content(schema),
+      content: build_content(schema, constraints),
       options: options
     }
   end
@@ -52,13 +58,14 @@ defmodule Swagdox.Response do
   @spec headers(t(), list(Header.t())) :: t()
   def headers(response, headers), do: %__MODULE__{response | headers: headers}
 
-  defp build_content(nil), do: nil
+  defp build_content(nil, _constraints), do: nil
 
-  # Render the schema the same way parameters and request bodies do, so primitive
-  # types (`string`, `integer`, ...) and arrays of primitives produce a real inline
-  # schema instead of a dangling `$ref` to a non-existent component.
-  defp build_content(schema) do
-    [%{media_type: "application/json", schema: Type.render(schema)}]
+  # The type is rendered at render time, not here, so the response schema honors the
+  # target OpenAPI version - the same way parameters and request bodies do. Primitive
+  # types (`string`, `integer`, ...) and arrays of primitives therefore produce a real
+  # inline schema instead of a dangling `$ref` to a non-existent component.
+  defp build_content(schema, constraints) do
+    [%{media_type: "application/json", type: schema, constraints: constraints}]
   end
 
   @doc """
@@ -99,26 +106,27 @@ defmodule Swagdox.Response do
 
   defp render_response(response, version) do
     %{"description" => response.description}
-    |> put_content(response.content, response.example)
+    |> put_content(response.content, response.example, version)
     |> put_headers(response.headers, version)
   end
 
   # A documented `@example` is attached to the media type. When a response carries an
   # example but no schema, an `application/json` media type is still emitted so the
   # example has somewhere valid to live.
-  defp put_content(rendered, nil, nil), do: rendered
+  defp put_content(rendered, nil, nil, _version), do: rendered
 
-  defp put_content(rendered, nil, example) do
+  defp put_content(rendered, nil, example, _version) do
     Map.put(rendered, "content", %{"application/json" => %{"example" => example}})
   end
 
-  defp put_content(rendered, content, example) do
-    Map.put(rendered, "content", render_content(content, example))
+  defp put_content(rendered, content, example, version) do
+    Map.put(rendered, "content", render_content(content, example, version))
   end
 
-  defp render_content(content, example) do
+  defp render_content(content, example, version) do
     Enum.reduce(content, %{}, fn value, acc ->
-      rendered = put_example(%{"schema" => value.schema}, example)
+      schema = Type.render(value.type, value.constraints, version)
+      rendered = put_example(%{"schema" => schema}, example)
       Map.put(acc, value.media_type, rendered)
     end)
   end

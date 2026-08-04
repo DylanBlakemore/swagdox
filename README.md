@@ -206,6 +206,43 @@ Arrays of types can be specified using the `[]` notation:
 @response 200, [User], ...
 ```
 
+#### Unions and polymorphism
+
+A union of types is written with `|`, and renders as a JSON Schema `oneOf`:
+
+```elixir
+@response 200, Cat | Dog, "A pet"
+@param pet(body), Cat | Dog, "The pet", required: true
+@property pet, Cat | string, "A pet, or its name"
+@response 200, [Cat | Dog], "Pets"
+```
+
+Members may be schemas or basic types, unions of three or more types flatten into a single
+`oneOf`, and a union nests inside the array notation as above.
+
+The other two JSON Schema composition keywords have no operator form:
+
+```elixir
+@property pet, any_of(Cat, string), "Matches one or more of its members"
+@property pet, all_of(Pet, Trainable), "Matches all of its members"
+```
+
+Any composition accepts a `discriminator` option - the OpenAPI hint that tells consumers which
+member applies, based on the value of a shared property. Either name the property, or give an
+explicit mapping of value to schema:
+
+```elixir
+@response 200, Cat | Dog, "A pet", discriminator: pet_type
+
+@response 200, Cat | Dog, "A pet",
+  discriminator: [property: pet_type, mapping: %{cat: Cat, dog: Dog}]
+```
+
+Bare schema names in a mapping are expanded to component references
+(`Cat` becomes `#/components/schemas/Cat`); values that already look like references are left
+as they are. Note that OpenAPI requires the discriminator property to be `required` on each
+member schema - Swagdox does not enforce this for you.
+
 ### Schemas
 
 Swagdox schemas can be defined by adding a schema definition to the moduledocs.
@@ -226,6 +263,57 @@ end
 ```
 
 Schemas are detected automatically based on the `[Swagdox] Schema:` tag.
+
+#### Composed schemas
+
+A schema is an object described by its properties, unless it declares a type of its own with
+`@type`. That is how a reusable polymorphic schema is defined - the type expression is the same
+one used inline, so `@type` accepts unions and the other compositions:
+
+```elixir
+defmodule MyApp.Pet do
+  @moduledoc """
+  A pet
+
+  [Swagdox] Schema:
+    @name Pet
+    @type Cat | Dog
+    @discriminator pet_type, %{cat: Cat, dog: Dog}
+  """
+end
+```
+
+which renders as:
+
+```json
+"Pet": {
+  "description": "A pet",
+  "oneOf": [
+    { "$ref": "#/components/schemas/Cat" },
+    { "$ref": "#/components/schemas/Dog" }
+  ],
+  "discriminator": {
+    "propertyName": "pet_type",
+    "mapping": {
+      "cat": "#/components/schemas/Cat",
+      "dog": "#/components/schemas/Dog"
+    }
+  }
+}
+```
+
+The mapping is optional - `@discriminator pet_type` on its own emits just the property name,
+and consumers fall back to matching schema names.
+
+A composed schema emits no `properties`, since it isn't an object. The exception is the
+"inheritance" shape, where a schema extends others and adds fields of its own:
+
+```elixir
+[Swagdox] Schema:
+  @name Cat
+  @type all_of(Pet)
+  @property lives, integer, "Remaining lives"
+```
 
 ## Installation
 

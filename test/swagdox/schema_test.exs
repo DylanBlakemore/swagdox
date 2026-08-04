@@ -3,6 +3,7 @@ defmodule Swagdox.SchemaTest do
 
   alias Swagdox.Order
   alias Swagdox.Schema
+  alias Swagdox.SearchResult
   alias Swagdox.User
 
   test "properties/1" do
@@ -134,6 +135,63 @@ defmodule Swagdox.SchemaTest do
     }
 
     assert %{"OrderName" => %{"required" => ["item"]}} = Schema.render(schema)
+  end
+
+  describe "composed schemas" do
+    test "type/1 and discriminator/1" do
+      assert Schema.type(SearchResult) == {"one_of", ["User", "OrderName"]}
+
+      assert Schema.discriminator(SearchResult) ==
+               [property: "kind", mapping: %{user: "User", order: "OrderName"}]
+    end
+
+    test "a schema with no @type is an object with no discriminator" do
+      assert Schema.type(Order) == "object"
+      assert Schema.discriminator(Order) == nil
+    end
+
+    test "render/1 emits oneOf and the discriminator instead of properties" do
+      assert SearchResult |> Schema.infer() |> Schema.render() == %{
+               "SearchResult" => %{
+                 "description" => "A single search result",
+                 "oneOf" => [
+                   %{"$ref" => "#/components/schemas/User"},
+                   %{"$ref" => "#/components/schemas/OrderName"}
+                 ],
+                 "discriminator" => %{
+                   "propertyName" => "kind",
+                   "mapping" => %{
+                     "user" => "#/components/schemas/User",
+                     "order" => "#/components/schemas/OrderName"
+                   }
+                 }
+               }
+             }
+    end
+
+    test "render/1 keeps properties alongside an allOf composition" do
+      schema = %Schema{
+        module: Order,
+        type: {"all_of", ["User"]},
+        properties: [{"item", "string", []}]
+      }
+
+      assert Schema.render(schema) == %{
+               "OrderName" => %{
+                 "description" => nil,
+                 "allOf" => [%{"$ref" => "#/components/schemas/User"}],
+                 "type" => "object",
+                 "properties" => %{"item" => %{"type" => "string"}}
+               }
+             }
+    end
+
+    test "render/1 emits a discriminator on an object schema" do
+      schema = %Schema{type: "object", module: Order, discriminator: "kind"}
+
+      assert %{"OrderName" => %{"discriminator" => %{"propertyName" => "kind"}}} =
+               Schema.render(schema)
+    end
   end
 
   test "infer/1 collects required properties from the required: true constraint" do

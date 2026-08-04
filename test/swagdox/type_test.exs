@@ -122,4 +122,119 @@ defmodule Swagdox.TypeTest do
                %{"allOf" => [%{"$ref" => "#/components/schemas/User"}], "format" => "uuid"}
     end
   end
+
+  describe "render/3 with compositions" do
+    test "one_of renders a oneOf of the member schemas" do
+      assert Type.render({"one_of", ["Cat", "Dog"]}) ==
+               %{
+                 "oneOf" => [
+                   %{"$ref" => "#/components/schemas/Cat"},
+                   %{"$ref" => "#/components/schemas/Dog"}
+                 ]
+               }
+    end
+
+    test "any_of and all_of render their respective keywords" do
+      assert Type.render({"any_of", ["string", "integer"]}) ==
+               %{"anyOf" => [%{"type" => "string"}, %{"type" => "integer"}]}
+
+      assert Type.render({"all_of", ["Cat", "object"]}) ==
+               %{"allOf" => [%{"$ref" => "#/components/schemas/Cat"}, %{"type" => "object"}]}
+    end
+
+    test "accepts atom compositions and atom members" do
+      assert Type.render({:one_of, [Cat, Dog]}) ==
+               %{
+                 "oneOf" => [
+                   %{"$ref" => "#/components/schemas/Cat"},
+                   %{"$ref" => "#/components/schemas/Dog"}
+                 ]
+               }
+    end
+
+    test "composes arrays of unions" do
+      assert Type.render([{"one_of", ["Cat", "Dog"]}], min_items: 1) ==
+               %{
+                 "type" => "array",
+                 "minItems" => 1,
+                 "items" => %{
+                   "oneOf" => [
+                     %{"$ref" => "#/components/schemas/Cat"},
+                     %{"$ref" => "#/components/schemas/Dog"}
+                   ]
+                 }
+               }
+    end
+
+    test "raises on an unknown composition" do
+      assert_raise ArgumentError, ~s(Unknown composition: "some_of"), fn ->
+        Type.render({"some_of", ["Cat"]})
+      end
+    end
+
+    test "raises on an empty composition" do
+      assert_raise ArgumentError, "one_of requires at least one type", fn ->
+        Type.render({"one_of", []})
+      end
+    end
+
+    test "a nullable union folds null in per the OpenAPI version" do
+      assert Type.render({"one_of", ["Cat"]}, [nullable: true], "3.0.0") ==
+               %{"oneOf" => [%{"$ref" => "#/components/schemas/Cat"}], "nullable" => true}
+
+      assert Type.render({"one_of", ["Cat"]}, [nullable: true], "3.1.0") ==
+               %{
+                 "anyOf" => [
+                   %{"oneOf" => [%{"$ref" => "#/components/schemas/Cat"}]},
+                   %{"type" => "null"}
+                 ]
+               }
+    end
+  end
+
+  describe "render/3 with a discriminator" do
+    test "a bare property name" do
+      assert Type.render({"one_of", ["Cat", "Dog"]}, discriminator: "pet_type") ==
+               %{
+                 "oneOf" => [
+                   %{"$ref" => "#/components/schemas/Cat"},
+                   %{"$ref" => "#/components/schemas/Dog"}
+                 ],
+                 "discriminator" => %{"propertyName" => "pet_type"}
+               }
+    end
+
+    test "a property name with an explicit mapping" do
+      constraints = [discriminator: [property: "pet_type", mapping: %{cat: "Cat", dog: "Dog"}]]
+
+      assert %{
+               "discriminator" => %{
+                 "propertyName" => "pet_type",
+                 "mapping" => %{
+                   "cat" => "#/components/schemas/Cat",
+                   "dog" => "#/components/schemas/Dog"
+                 }
+               }
+             } = Type.render({"one_of", ["Cat", "Dog"]}, constraints)
+    end
+
+    test "leaves an explicit reference in the mapping untouched" do
+      constraints = [discriminator: [property: "pet_type", mapping: %{cat: "#/components/x/Cat"}]]
+
+      assert %{"discriminator" => %{"mapping" => %{"cat" => "#/components/x/Cat"}}} =
+               Type.render({"one_of", ["Cat"]}, constraints)
+    end
+
+    test "raises when the discriminator has no property" do
+      assert_raise ArgumentError, "A discriminator requires a :property", fn ->
+        Type.render({"one_of", ["Cat"]}, discriminator: [mapping: %{cat: "Cat"}])
+      end
+    end
+
+    test "raises when a discriminator is used without a composition" do
+      assert_raise ArgumentError,
+                   "A discriminator is only valid on a one_of, any_of, or all_of type",
+                   fn -> Type.render("User", discriminator: "pet_type") end
+    end
+  end
 end

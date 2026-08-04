@@ -4,6 +4,7 @@ defmodule Swagdox.SchemaBuilderTest do
   alias Swagdox.Order
   alias Swagdox.Schema
   alias Swagdox.SchemaBuilder
+  alias Swagdox.SearchResult
   alias Swagdox.User
 
   describe "build_schemas/0" do
@@ -12,6 +13,7 @@ defmodule Swagdox.SchemaBuilderTest do
 
       assert [
                %Schema{module: Order},
+               %Schema{module: SearchResult},
                %Schema{module: User}
              ] = schemas
     end

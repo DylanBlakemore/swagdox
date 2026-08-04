@@ -22,6 +22,7 @@ defmodule Swagdox.MixProject do
         ignore_modules: [
           Mix.Tasks.Swagdox.Generate,
           Swagdox.Order,
+          Swagdox.SearchResult,
           Swagdox.User,
           SwagdoxWeb.DefaultConfig,
           SwagdoxWeb.Router,

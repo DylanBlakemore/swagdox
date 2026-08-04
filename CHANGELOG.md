@@ -12,6 +12,24 @@
 - Add standalone `@example` and `@header` tags (keyed by status code) for documenting response
   examples and response headers. Headers are modelled by a `Swagdox.Header` struct and rendered
   through `Swagdox.Type`, so their schemas honor the configured OpenAPI version.
+- Support union and polymorphic types. A union is written with `|` (`Cat | Dog`) and renders as
+  `oneOf`; `any_of(...)` and `all_of(...)` cover the remaining JSON Schema composition keywords.
+  Unions work anywhere a type does - `@param`, `@property`, `@response`, `@header` - and nest
+  inside the array notation (`[Cat | Dog]`).
+- Add a `discriminator` option to compositions, accepting either a property name or
+  `[property: ..., mapping: %{...}]`. Bare schema names in a mapping are expanded to component
+  references.
+- Add the schema-level `@type` tag, so a named schema can be a composition
+  (`@type Cat | Dog`) rather than a property bag, optionally with a `@discriminator`. A composed
+  schema that also documents properties renders both, covering the `allOf`-plus-own-fields
+  inheritance shape.
+
+### Fixes
+
+- Render response schemas at render time, so a `@response`'s schema honors the configured
+  `openapi_version` (previously it was always rendered as 3.0). Schema constraints in a
+  `@response`'s trailing options (`nullable`, `discriminator`, ...) now reach the schema instead
+  of being dropped; options that describe the response itself are left untouched.
 
 ## [0.3.0] - 08 June 2026
 

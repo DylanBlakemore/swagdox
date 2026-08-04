@@ -126,6 +126,14 @@ defmodule Swagdox.SpecTest do
                    required: []
                  },
                  %Schema{
+                   module: Swagdox.SearchResult,
+                   type: {"one_of", ["User", "OrderName"]},
+                   discriminator: [
+                     property: "kind",
+                     mapping: %{user: "User", order: "OrderName"}
+                   ]
+                 },
+                 %Schema{
                    module: Swagdox.User,
                    type: "object",
                    properties: [

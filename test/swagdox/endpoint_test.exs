@@ -147,6 +147,50 @@ defmodule Swagdox.EndpointTest do
              ] = responses
     end
 
+    test "renders a union response, including its discriminator" do
+      endpoint = %Endpoint{
+        module: UserController,
+        function: :show,
+        docstring: """
+        Returns a pet.
+
+        [Swagdox] API:
+          @response 200, User | OrderName, "A pet", discriminator: kind
+          @response 201, [User | OrderName], "Pets"
+        """
+      }
+
+      assert [union, array_of_unions] = Endpoint.responses(endpoint)
+
+      one_of = [
+        %{"$ref" => "#/components/schemas/User"},
+        %{"$ref" => "#/components/schemas/OrderName"}
+      ]
+
+      assert %{
+               "200" => %{
+                 "content" => %{
+                   "application/json" => %{
+                     "schema" => %{
+                       "oneOf" => ^one_of,
+                       "discriminator" => %{"propertyName" => "kind"}
+                     }
+                   }
+                 }
+               }
+             } = Response.render(union)
+
+      assert %{
+               "201" => %{
+                 "content" => %{
+                   "application/json" => %{
+                     "schema" => %{"type" => "array", "items" => %{"oneOf" => ^one_of}}
+                   }
+                 }
+               }
+             } = Response.render(array_of_unions)
+    end
+
     test "attaches @example and @header tags to the response with the matching status" do
       endpoint = %Endpoint{
         module: UserController,
