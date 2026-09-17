@@ -51,7 +51,8 @@ defmodule Swagdox.Type do
   @array_keys [:min_items, :max_items]
 
   # Every option that describes the schema, as opposed to its surroundings.
-  @schema_keys [:nullable, :discriminator, :required] ++ Map.keys(@constraint_keys)
+  @schema_keys [:additional_properties, :nullable, :discriminator, :required] ++
+                 Map.keys(@constraint_keys)
 
   @type composition :: {String.t() | atom(), list()}
   @type variable :: String.t() | [String.t()] | atom() | [atom()] | composition()
@@ -166,12 +167,29 @@ defmodule Swagdox.Type do
   defp apply_constraints(base, constraints, version) do
     {nullable, constraints} = Keyword.pop(constraints, :nullable, false)
     {discriminator, constraints} = Keyword.pop(constraints, :discriminator)
+    {additional_properties, constraints} = Keyword.pop(constraints, :additional_properties)
     constraints = Keyword.delete(constraints, :required)
 
     base
     |> merge_constraints(constraints)
+    |> apply_additional_properties(additional_properties, version)
     |> apply_discriminator(discriminator)
     |> apply_nullable(nullable, version)
+  end
+
+  defp apply_additional_properties(base, nil, _version), do: base
+
+  defp apply_additional_properties(%{"type" => "object"} = base, value, _version)
+       when is_boolean(value) do
+    Map.put(base, "additionalProperties", value)
+  end
+
+  defp apply_additional_properties(%{"type" => "object"} = base, value, version) do
+    Map.put(base, "additionalProperties", render(value, [], version))
+  end
+
+  defp apply_additional_properties(_base, _value, _version) do
+    raise ArgumentError, "additional_properties is only valid on object types"
   end
 
   defp apply_discriminator(base, nil), do: base
@@ -205,11 +223,15 @@ defmodule Swagdox.Type do
 
   defp apply_nullable(map, true, version) do
     if String.starts_with?(version, "3.0") do
-      Map.put(map, "nullable", true)
+      nullable_oas_3(map)
     else
       nullable_union(map)
     end
   end
+
+  defp nullable_oas_3(%{"type" => _type} = map), do: Map.put(map, "nullable", true)
+
+  defp nullable_oas_3(map), do: %{"anyOf" => [map, %{"enum" => [nil]}]}
 
   defp nullable_union(%{"type" => type} = map) when is_binary(type) do
     Map.put(map, "type", [type, "null"])

@@ -291,6 +291,19 @@ defmodule Swagdox.ParserTest do
                {:property, ["status", "string", "Status", [enum: ["a", "b"]]]}
     end
 
+    test "property with typed additional properties" do
+      line = "@property params, object, \"Parameters\", additional_properties: ChartTemplateScalar"
+
+      assert Parser.parse_definition(line) ==
+               {:property,
+                [
+                  "params",
+                  "object",
+                  "Parameters",
+                  [additional_properties: "ChartTemplateScalar"]
+                ]}
+    end
+
     test "param with a size constraint" do
       line = "@param body(body), [User], \"Users\", required: true, min_items: 1"
 
