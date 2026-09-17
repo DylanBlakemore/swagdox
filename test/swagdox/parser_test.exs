@@ -292,7 +292,8 @@ defmodule Swagdox.ParserTest do
     end
 
     test "property with typed additional properties" do
-      line = "@property params, object, \"Parameters\", additional_properties: ChartTemplateScalar"
+      line =
+        "@property params, object, \"Parameters\", additional_properties: ChartTemplateScalar"
 
       assert Parser.parse_definition(line) ==
                {:property,

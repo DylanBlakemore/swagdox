@@ -117,7 +117,10 @@ defmodule Swagdox.TypeTest do
 
   describe "split_constraints/1" do
     test "keeps additional_properties with schema constraints" do
-      assert Type.split_constraints(additional_properties: "User", content_type: "application/json") ==
+      assert Type.split_constraints(
+               additional_properties: "User",
+               content_type: "application/json"
+             ) ==
                {[additional_properties: "User"], [content_type: "application/json"]}
     end
   end
