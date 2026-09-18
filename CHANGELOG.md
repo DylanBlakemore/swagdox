@@ -23,6 +23,9 @@
   (`@type Cat | Dog`) rather than a property bag, optionally with a `@discriminator`. A composed
   schema that also documents properties renders both, covering the `allOf`-plus-own-fields
   inheritance shape.
+- Add `additional_properties` to the `@property` and `@param` constraint DSL for typed object
+  dictionaries. It accepts a Swagdox type or a boolean and renders OpenAPI's
+  `additionalProperties` keyword.
 
 ### Fixes
 
@@ -30,6 +33,9 @@
   `openapi_version` (previously it was always rendered as 3.0). Schema constraints in a
   `@response`'s trailing options (`nullable`, `discriminator`, ...) now reach the schema instead
   of being dropped; options that describe the response itself are left untouched.
+- Render nullable references and compositions as an explicit `anyOf` with a null-only enum branch
+  for OpenAPI 3.0, rather than attaching `nullable` where it has no effect or is an invalid `$ref`
+  sibling.
 
 ## [0.3.0] - 08 June 2026
 
@@ -89,7 +95,6 @@
 - Describe endpoints using function docs
   - Controllers are detected by defining the router module
   - Endpoints are detected within the controller by the presence of `[Swagdox] API:` tag
-
 
 
 

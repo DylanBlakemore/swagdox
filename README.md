@@ -130,11 +130,13 @@ camelCase form):
 | `minimum` / `maximum`      | numbers           | `minimum` / `maximum`      |
 | `pattern: "^..$"`          | strings           | `pattern`                  |
 | `min_items` / `max_items`  | arrays            | `minItems` / `maxItems`    |
+| `additional_properties: T` | objects           | `additionalProperties`     |
 
 ```elixir
 @property status, string, "Generation status", enum: ["generating", "complete", "failed"]
 @property created_at, string, "Creation timestamp", format: "date-time"
 @param tags(body), [string], "Tags", required: true, min_items: 1
+@property attributes, object, "Attributes by key", additional_properties: string
 ```
 
 For array types (e.g. `[string]`), scalar constraints (`enum`, `format`, `nullable`,
@@ -153,6 +155,15 @@ per-property key:
 @property email, string, "User email", required: true
 # => the "User" schema gains "required": ["email"]
 ```
+
+`additional_properties` constrains arbitrary object values. It accepts another Swagdox type or a
+boolean, so a typed dictionary can reuse a named schema:
+
+```elixir
+@property params, object, "Parameter values", additional_properties: ChartTemplateScalar
+```
+
+The resulting schema's `additionalProperties` value is a reference to `ChartTemplateScalar`.
 
 #### Responses
 

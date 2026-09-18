@@ -84,6 +84,45 @@ defmodule Swagdox.TypeTest do
                  "items" => %{"$ref" => "#/components/schemas/User"}
                }
     end
+
+    test "additional_properties renders a typed map" do
+      assert Type.render("object", additional_properties: "User") ==
+               %{
+                 "type" => "object",
+                 "additionalProperties" => %{"$ref" => "#/components/schemas/User"}
+               }
+    end
+
+    test "additional_properties renders a composed value schema" do
+      assert Type.render("object", additional_properties: {"one_of", ["string", "integer"]}) ==
+               %{
+                 "type" => "object",
+                 "additionalProperties" => %{
+                   "oneOf" => [%{"type" => "string"}, %{"type" => "integer"}]
+                 }
+               }
+    end
+
+    test "additional_properties accepts boolean values" do
+      assert Type.render("object", additional_properties: false) ==
+               %{"type" => "object", "additionalProperties" => false}
+    end
+
+    test "additional_properties is only valid on object types" do
+      assert_raise ArgumentError, "additional_properties is only valid on object types", fn ->
+        Type.render("string", additional_properties: "User")
+      end
+    end
+  end
+
+  describe "split_constraints/1" do
+    test "keeps additional_properties with schema constraints" do
+      assert Type.split_constraints(
+               additional_properties: "User",
+               content_type: "application/json"
+             ) ==
+               {[additional_properties: "User"], [content_type: "application/json"]}
+    end
   end
 
   describe "render/3 nullable" do
@@ -113,6 +152,11 @@ defmodule Swagdox.TypeTest do
     test "3.1.x expresses a nullable reference as an anyOf union" do
       assert Type.render("User", [nullable: true], "3.1.0") ==
                %{"anyOf" => [%{"$ref" => "#/components/schemas/User"}, %{"type" => "null"}]}
+    end
+
+    test "3.0.x expresses a nullable reference without extending a reference object" do
+      assert Type.render("User", [nullable: true], "3.0.0") ==
+               %{"anyOf" => [%{"$ref" => "#/components/schemas/User"}, %{"enum" => [nil]}]}
     end
   end
 
@@ -178,9 +222,14 @@ defmodule Swagdox.TypeTest do
       end
     end
 
-    test "a nullable union folds null in per the OpenAPI version" do
+    test "a nullable union renders null per the OpenAPI version" do
       assert Type.render({"one_of", ["Cat"]}, [nullable: true], "3.0.0") ==
-               %{"oneOf" => [%{"$ref" => "#/components/schemas/Cat"}], "nullable" => true}
+               %{
+                 "anyOf" => [
+                   %{"oneOf" => [%{"$ref" => "#/components/schemas/Cat"}]},
+                   %{"enum" => [nil]}
+                 ]
+               }
 
       assert Type.render({"one_of", ["Cat"]}, [nullable: true], "3.1.0") ==
                %{
